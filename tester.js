@@ -1,2 +1,3 @@
 var if_action = new Action_if_eval();
-if_action.edit();
+var sceneview = document.getElementById('scenedata');
+sceneview.replaceChildren(if_action.display());
