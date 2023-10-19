@@ -26,7 +26,31 @@ class Action extends BuildingBlock{
     this.actions = null;
     this.actionNodes = document.createElement('div');
     this.node.append(this.actionNodes);
+  }
 
+  load(data) {
+    if (this.actions){
+      console.log(data['actions']);
+      for (const action of data['actions']){
+        console.log(action);
+        var new_action = eval("new " + action['name'] + "({'parent':this})");
+        new_action.load(action);
+        this.actions.push(new_action);
+      }
+    }
+  }
+
+  save() {
+    var data = {'name':this.name};
+    var actions = null;
+    if (this.actions){
+      actions = [];
+      for (const action of this.actions){
+        actions.push(action.save());
+      }
+    }
+    data['actions'] = actions;
+    return data;
   }
 
   display() {
@@ -142,6 +166,19 @@ class Action_set_var extends Action {
     this.value = null;
   }
 
+  load(data){
+    super.load(data);
+    this.variable = data['variable'];
+    this.value = data['value'];
+  }
+
+  save(){
+    var data = super.save();
+    data['variable'] = this.variable;
+    data['value'] = this.value;
+    return data;
+  }
+
   updateDisplay(){
     this.nodeSpan.innerHTML = '<b>Set</b> $' + this.variable + ' <b>to</b> ' + this.value;
   }
@@ -181,6 +218,17 @@ class Action_message extends Action {
     this.description = "Display a modal message.";
 
     this.text_lines = [];
+  }
+
+  load(data){
+    super.load(data);
+    this.text_lines = data['text_lines'];
+  }
+
+  save(){
+    var data = super.save();
+    data['text_lines'] = this.text_lines;
+    return data;
   }
 
   updateDisplay(){
@@ -231,6 +279,19 @@ class Action_start_timer extends Action {
 
     this.milliseconds = 0;
     this.variable = '';
+  }
+
+  load(data){
+    super.load(data);
+    this.milliseconds = data['milliseconds'];
+    this.variable = data['variable'];
+  }
+
+  save(){
+    var data = super.save();
+    data['milliseconds'] = this.milliseconds;
+    data['variable'] = this.variable;
+    return data;
   }
 
   updateDisplay(){
@@ -300,6 +361,21 @@ class Action_if_eval extends Action {
     this.val1 = null;
     this.val2 = null;
     this.operator = this.operators[0];
+  }
+
+  load(data){
+    super.load(data);
+    this.val1 = data['val1'];
+    this.val2 = data['val2'];
+    this.val3 = data['val3'];
+  }
+
+  save(){
+    var data = super.save();
+    data['val1'] = this.val1;
+    data['val2'] = this.val2;
+    data['operator'] = this.operator;
+    return data;
   }
 
   updateDisplay(){
