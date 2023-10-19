@@ -12,8 +12,10 @@ function actionFactory(action_list){
 }
 
 //register actions here, for add method.
-const action_types = ['Action_else','Action_if_eval'];
+const action_types = ['Action_else','Action_if_eval','Action_message','Action_start_timer'];
 
+
+//prototype for all actions
 class Action extends BuildingBlock{
 
   constructor(data) {
@@ -22,6 +24,8 @@ class Action extends BuildingBlock{
     this.type = "Action";
     this.description = "Action";
     this.actions = null;
+    this.actionNodes = document.createElement('div');
+    this.node.append(this.actionNodes);
 
   }
 
@@ -30,7 +34,7 @@ class Action extends BuildingBlock{
 
     if (this.actions){
       for (var action of this.actions){
-        this.node.append(action.display());
+        this.actionNodes.append(action.display());
       }
     }
     return this.node;
@@ -41,15 +45,28 @@ class Action extends BuildingBlock{
   }
 
   add(action_type){
-    var new_action = eval("new " + action_type + "()");
+    var data = {'parent':this};
+    var new_action = eval("new " + action_type + "(data)");
     this.actions.push(new_action);
-    this.node.append(new_action.display());
+    this.actionNodes.append(new_action.display());
   }
 
   edit(){
-    if (this.actions){
-      var editView = document.getElementById("editview");
+    var editView = document.getElementById("editview");
+    editView.replaceChildren();
 
+    var title = document.createElement("span");
+    var bold = document.createElement("b");
+    bold.innerHTML = this.name + "<br>";
+    title.append(bold);
+    var description = document.createElement("p");
+    description.innerHTML = this.description;
+    editView.append(title,description,document.createElement('br'));
+
+    editView.append(this.moveUpButton,document.createElement('br'));
+    editView.append(this.moveDownButton,document.createElement('br'),document.createElement('br'));
+
+    if (this.actions){
       var me = this;
       this.newActionSelector = document.createElement('select');
       for (const aType of action_types){
@@ -68,8 +85,138 @@ class Action extends BuildingBlock{
         },
         false,
       );
-      editView.replaceChildren(this.newActionSelector,addActionButton,document.createElement('br'),document.createElement('br'));
+      editView.append(this.newActionSelector,addActionButton,document.createElement('br'),document.createElement('br'));
     }
+  }
+
+  moveUp(){
+    super.moveUp();
+    if(this.parent){
+      var p_actions = this.parent.actions;
+      if (p_actions.length > 1){
+        var i = p_actions.indexOf(this);
+        if (i != 0){
+          p_actions.splice(i,1);
+          p_actions.splice(i-1,0,this);
+        }
+      console.log("Move up in parent action list: " + i);
+      console.log(p_actions);
+      }
+    }
+  }
+
+  moveDown(){
+    super.moveDown();
+    if(this.parent){
+      var p_actions = this.parent.actions;
+      if (p_actions.length > 1){
+        var i = this.parent.actions.indexOf(this);
+        if (i != p_actions.length - 1){
+          p_actions.splice(i,1);
+          p_actions.splice(i+1,0,this);
+        }
+      console.log("Move down in parent action list: " + i);
+      console.log(p_actions);
+    }
+    }
+  }
+}
+
+class Action_message extends Action {
+
+  constructor(data) {
+    super(data);
+
+    this.name = "Action_message";
+    this.description = "Display a modal message.";
+
+    this.text_lines = [];
+  }
+
+  updateDisplay(){
+    if (this.text_lines.length > 0){
+      if (this.text_lines[0].length >= 21){
+        this.nodeSpan.innerHTML = '<b>Message<b> "' + this.text_lines[0].slice(0,20) + '..."';
+      }else{
+        this.nodeSpan.innerHTML = '<b>Message<b> "' + this.text_lines[0] + '"';
+      }
+    }else{
+      this.nodeSpan.innerHTML = '<b>Message</b>';
+    }
+  }
+
+  edit(){
+    super.edit();
+    var me = this;
+    var editView = document.getElementById("editview");
+
+    var inputLabel = document.createElement("label")
+    inputLabel.innerHTML = "Message: ";
+
+    var messageInputField = createElementWithAttributes('textarea',{'rows':'8','cols':'30'});
+
+    var text = '';
+    for (const line of this.text_lines){
+      text += line + "\n";
+    }
+
+    messageInputField.value = text;
+    messageInputField.addEventListener("change", (event)=> {
+      me.text_lines = event.target.value.split('\n');
+      me.updateDisplay();
+    })
+
+    editView.append(inputLabel,document.createElement("br"),messageInputField);
+  }
+}
+
+
+class Action_start_timer extends Action {
+
+  constructor(data){
+    super(data);
+
+    this.name = "Action_start_timer";
+    this.description = "Start a timer. Uses the variable field if set.";
+
+    this.milliseconds = 0;
+    this.variable = '';
+  }
+
+  updateDisplay(){
+    if (this.variable.length > 0){
+      this.nodeSpan.innerHTML = '<b>Timer:</b> $' + this.variable;
+    } else {
+      this.nodeSpan.innerHTML = '<b>Timer:</b> ' + this.milliseconds + 'ms';
+    }
+  }
+
+  edit(){
+    super.edit();
+    var me = this;
+    var editView = document.getElementById("editview");
+
+    var inputLabel = document.createElement("label")
+    inputLabel.innerHTML = "Milliseconds: ";
+
+    var msInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':'10000'});
+    msInputField.value = this.milliseconds;
+    msInputField.addEventListener("change", (event)=> {
+      me.milliseconds = event.target.value;
+      me.updateDisplay();
+    })
+
+    var inputLabel2 = document.createElement("label")
+    inputLabel2.innerHTML = " or variable: ";
+
+    var varInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    varInputField.value = this.variable;
+    varInputField.addEventListener("change", (event)=> {
+      me.variable = event.target.value;
+      me.updateDisplay();
+    })
+
+    editView.append(inputLabel,msInputField,inputLabel2,varInputField);
   }
 }
 
@@ -79,15 +226,13 @@ class Action_else extends Action {
     super(data);
 
     this.name = "Action_else";
-    this.description = "else";
+    this.description = "else. Does nothing unless it is the child of an If action.";
     this.actions = [];
   }
 
   updateDisplay(){
     this.nodeSpan.innerHTML = '<b>else</b>';
   }
-
-
 }
 
 class Action_if_eval extends Action {
@@ -96,14 +241,14 @@ class Action_if_eval extends Action {
     super(data);
 
     this.name = "Action_if_eval";
-    this.description = "if/then"
+    this.description = "if/then. Add an else action as a child to get that functionality.";
     this.actions = [];
 
     this.operators = ['>','<','>=','<=','==','!='];
 
     //initialization values for eval fields
-    this.val1 = '';
-    this.val2 = '';
+    this.val1 = null;
+    this.val2 = null;
     this.operator = this.operators[0];
   }
 
@@ -121,23 +266,10 @@ class Action_if_eval extends Action {
     }
   }
 
-  load(){
-    console.log("Building Action_if from saved json data.")
-  }
-
-  save(){
-    console.log("Returning json formatted Action_if for storage.")
-  }
-
   edit(){
     super.edit();
     var me = this;
     var editView = document.getElementById("editview");
-
-    var title = document.createElement("span");
-    var bold = document.createElement("b");
-    bold.innerHTML = this.name + "[" + this.description + "]<br>";
-    title.append(bold);
 
     var inputLabel1 = document.createElement("label")
     inputLabel1.innerHTML = "Value 1: ";
@@ -176,6 +308,6 @@ class Action_if_eval extends Action {
       me.updateDisplay();
     })
 
-    editView.append(title,inputLabel1,val1InputField,operatorSelector,inputLabel2,val2InputField);
+    editView.append(inputLabel1,val1InputField,operatorSelector,inputLabel2,val2InputField);
   }
 }
