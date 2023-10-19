@@ -12,7 +12,7 @@ function actionFactory(action_list){
 }
 
 //register actions here, for add method.
-const action_types = ['Action_else','Action_if_eval','Action_message','Action_start_timer'];
+const action_types = ['Action_else','Action_if_eval','Action_message','Action_start_timer','Action_set_var'];
 
 
 //prototype for all actions
@@ -63,8 +63,7 @@ class Action extends BuildingBlock{
     description.innerHTML = this.description;
     editView.append(title,description,document.createElement('br'));
 
-    editView.append(this.moveUpButton,document.createElement('br'));
-    editView.append(this.moveDownButton,document.createElement('br'),document.createElement('br'));
+    editView.append(this.moveUpButton,this.moveDownButton,this.removeButton,document.createElement('br'),document.createElement('br'));
 
     if (this.actions){
       var me = this;
@@ -87,6 +86,15 @@ class Action extends BuildingBlock{
       );
       editView.append(this.newActionSelector,addActionButton,document.createElement('br'),document.createElement('br'));
     }
+  }
+
+  remove(){
+    super.remove();
+    if(this.parent){
+      this.parent.actions.splice(this.parent.actions.indexOf(this),1);
+    }
+    var editView = document.getElementById('editview');
+    editView.replaceChildren();
   }
 
   moveUp(){
@@ -122,6 +130,48 @@ class Action extends BuildingBlock{
   }
 }
 
+class Action_set_var extends Action {
+
+  constructor(data) {
+    super(data);
+
+    this.name = "Action_set_var";
+    this.description = "Set a variable.";
+
+    this.variable = null;
+    this.value = null;
+  }
+
+  updateDisplay(){
+    this.nodeSpan.innerHTML = '<b>Set</b> $' + this.variable + ' <b>to</b> ' + this.value;
+  }
+
+  edit() {
+    super.edit();
+    var me = this;
+    var editView = document.getElementById("editview");
+
+    var inputLabel = document.createElement('label');
+    inputLabel.innerHTML = "Variable name: ";
+    var variableInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    variableInputField.addEventListener("change", (event)=> {
+      me.variable = event.target.value;
+      me.updateDisplay();
+    })
+
+
+    var inputLabel2 = document.createElement('label');
+    inputLabel2.innerHTML = "Value:"
+    var valueInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    valueInputField.addEventListener("change", (event)=> {
+      me.value = event.target.value;
+      me.updateDisplay();
+    })
+
+    editView.append(inputLabel,variableInputField,inputLabel2,valueInputField);
+  }
+}
+
 class Action_message extends Action {
 
   constructor(data) {
@@ -136,9 +186,9 @@ class Action_message extends Action {
   updateDisplay(){
     if (this.text_lines.length > 0){
       if (this.text_lines[0].length >= 21){
-        this.nodeSpan.innerHTML = '<b>Message<b> "' + this.text_lines[0].slice(0,20) + '..."';
+        this.nodeSpan.innerHTML = '<b>Message</b> "' + this.text_lines[0].slice(0,20) + '..."';
       }else{
-        this.nodeSpan.innerHTML = '<b>Message<b> "' + this.text_lines[0] + '"';
+        this.nodeSpan.innerHTML = '<b>Message</b> "' + this.text_lines[0] + '"';
       }
     }else{
       this.nodeSpan.innerHTML = '<b>Message</b>';

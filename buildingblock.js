@@ -27,6 +27,8 @@ class BuildingBlock {
     this.moveDownButton.innerHTML = '<i class="arrow down"></i>'
     this.moveUpButton = document.createElement('button');
     this.moveUpButton.innerHTML = '<i class="arrow up"></i>'
+    this.removeButton = document.createElement('button');
+    this.removeButton.innerHTML = 'Remove';
     var me = this;
     this.moveDownButton.addEventListener(
       "click",
@@ -39,6 +41,13 @@ class BuildingBlock {
       "click",
       function () {
         me.moveUp();
+      },
+      false,
+    );
+    this.removeButton.addEventListener(
+      "click",
+      function () {
+        me.remove();
       },
       false,
     );
