@@ -191,6 +191,7 @@ class Action_set_var extends Action {
     var inputLabel = document.createElement('label');
     inputLabel.innerHTML = "Variable name: ";
     var variableInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    variableInputField.value = this.variable;
     variableInputField.addEventListener("change", (event)=> {
       me.variable = event.target.value;
       me.updateDisplay();
@@ -200,6 +201,7 @@ class Action_set_var extends Action {
     var inputLabel2 = document.createElement('label');
     inputLabel2.innerHTML = "Value:"
     var valueInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    valueInputField.value = this.value;
     valueInputField.addEventListener("change", (event)=> {
       me.value = event.target.value;
       me.updateDisplay();
