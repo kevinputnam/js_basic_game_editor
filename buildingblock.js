@@ -1,12 +1,6 @@
-function flipCaret(tag){
-      tag.parentElement.querySelector(".nested").classList.toggle("active");
-      tag.classList.toggle("caret-down");
-}
-
 
 //prototype for all game objects
 class BuildingBlock {
-  static next_id = 0;
 
   constructor(data) {
     this.parent = null;
@@ -15,8 +9,6 @@ class BuildingBlock {
         this.parent = data.parent;
       }
     }
-    this.id = BuildingBlock.next_id;
-    BuildingBlock.next_id += 1;
     this.name = 'undefined node';
     this.description = 'BuildingBlock';
     this.node = document.createElement("div");
@@ -85,7 +77,6 @@ class BuildingBlock {
 
   moveUp(){
     var parent = this.node.parentElement;
-    console.log(parent.children.length);
     if (parent.children.length != 1){
       var index = Array.prototype.indexOf.call(parent.children, this.node);
       if (index != 0){
@@ -97,7 +88,6 @@ class BuildingBlock {
 
   moveDown(){
     var parent = this.node.parentElement;
-    console.log(parent.children.length);
     if (parent.children.length != 1){
       var index = Array.prototype.indexOf.call(parent.children, this.node);
       if (index != parent.children.length - 1){

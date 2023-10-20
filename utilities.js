@@ -5,3 +5,8 @@ function createElementWithAttributes(type,att_dict){
   }
   return el;
 }
+
+function flipCaret(tag){
+      tag.parentElement.querySelector(".nested").classList.toggle("active");
+      tag.classList.toggle("caret-down");
+}

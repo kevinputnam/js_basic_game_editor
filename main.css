@@ -19,8 +19,8 @@ html {
     left: 10px;
     top:  30px;
     width: 400px;
-    height: 270px;
-    max-height: 270px;
+    height: 800px;
+    max-height: 800px;
     max-width: 400px;
     border:  1px solid #000000;
     padding:  10px;
@@ -67,7 +67,7 @@ div .editsave {
     left: 440px;
     top: 330px;
     width: 750px;
-    height: 480px;
+    height: 500px;
     padding: 10px;
     border:  1px solid #000000;
     -ms-overflow-style: none; /*hides scroll bars for ms browsers*/

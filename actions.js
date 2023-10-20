@@ -30,9 +30,7 @@ class Action extends BuildingBlock{
 
   load(data) {
     if (this.actions){
-      console.log(data['actions']);
       for (const action of data['actions']){
-        console.log(action);
         var new_action = eval("new " + action['name'] + "({'parent':this})");
         new_action.load(action);
         this.actions.push(new_action);
@@ -89,8 +87,9 @@ class Action extends BuildingBlock{
 
     editView.append(this.moveUpButton,this.moveDownButton,this.removeButton,document.createElement('br'),document.createElement('br'));
 
+    var me = this;
     if (this.actions){
-      var me = this;
+
       this.newActionSelector = document.createElement('select');
       for (const aType of action_types){
         var opt = new Option;
@@ -100,7 +99,6 @@ class Action extends BuildingBlock{
       }
       var addActionButton = document.createElement('button');
       addActionButton.innerHTML = "Add Action";
-      var me = this;
       addActionButton.addEventListener(
         "click",
         function () {
@@ -131,8 +129,6 @@ class Action extends BuildingBlock{
           p_actions.splice(i,1);
           p_actions.splice(i-1,0,this);
         }
-      console.log("Move up in parent action list: " + i);
-      console.log(p_actions);
       }
     }
   }
@@ -147,9 +143,7 @@ class Action extends BuildingBlock{
           p_actions.splice(i,1);
           p_actions.splice(i+1,0,this);
         }
-      console.log("Move down in parent action list: " + i);
-      console.log(p_actions);
-    }
+      }
     }
   }
 }
