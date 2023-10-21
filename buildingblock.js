@@ -11,88 +11,107 @@ class BuildingBlock {
     }
     this.name = 'undefined node';
     this.description = 'BuildingBlock';
-    this.node = document.createElement("div");
-    this.node.setAttribute("class","treeNode");
-    this.nodeSpan = document.createElement("span");
-    this.node.append(this.nodeSpan);
-    this.moveDownButton = document.createElement('button');
-    this.moveDownButton.innerHTML = '<i class="arrow down"></i>'
-    this.moveUpButton = document.createElement('button');
-    this.moveUpButton.innerHTML = '<i class="arrow up"></i>'
-    this.removeButton = document.createElement('button');
-    this.removeButton.innerHTML = 'Remove';
+    this.nodes = [];
+    this.currentNode = null;
+  }
+
+  updateNodes() {
+    for (const node of this.nodes){
+      var nodeSpan = node.firstChild;
+      this.updateDisplay(nodeSpan);
+    }
+  }
+
+  updateDisplay(nodespan) {
+    nodeSpan.innerHTML = '<b>'+ this.name + ':</b> ' + this.description;
+  }
+
+  display() { //default display method
+
+    var node = document.createElement("div");
+    node.setAttribute("class","treeNode");
+    var nodeSpan = document.createElement("span");
+    node.append(nodeSpan);
+
     var me = this;
-    this.moveDownButton.addEventListener(
-      "click",
-      function () {
-        me.moveDown();
-      },
-      false,
-    );
-    this.moveUpButton.addEventListener(
-      "click",
-      function () {
-        me.moveUp();
-      },
-      false,
-    );
-    this.removeButton.addEventListener(
+    nodeSpan.addEventListener(
+      "click", (event)=> {
+        toggleHighlight(nodeSpan);
+        me.edit(node);
+      });
+    this.nodes.push(node);
+    this.updateNodes();
+    return node;
+  }
+
+  edit(node){
+    this.currentNode = node;
+    console.log(this.currentNode);
+  }
+
+  createRemoveButton(){
+    var me = this;
+    var removeButton = document.createElement('button');
+    removeButton.innerHTML = 'Remove';
+    removeButton.addEventListener(
       "click",
       function () {
         me.remove();
       },
       false,
     );
+    return removeButton;
   }
 
-  updateDisplay() {
-    this.nodeSpan.innerHTML = '<b>'+ this.name + ':</b> ' + this.description;
-  }
-
-  display() { //default display method
-    this.updateDisplay();
+  createUpAndDownButtons(){
     var me = this;
-    this.nodeSpan.addEventListener(
+
+    var moveDownButton = document.createElement('button');
+    moveDownButton.innerHTML = '<i class="arrow down"></i>'
+    var moveUpButton = document.createElement('button');
+    moveUpButton.innerHTML = '<i class="arrow up"></i>'
+    moveDownButton.addEventListener(
       "click",
       function () {
-        var highlighted_divs = document.getElementsByClassName('select-highlight');
-        for (const d of highlighted_divs){
-          d.classList.remove('select-highlight');
-        }
-        me.nodeSpan.classList.add('select-highlight');
-        me.edit();
+        me.moveDown();
       },
       false,
     );
-    return this.node;
-  }
+    moveUpButton.addEventListener(
+      "click",
+      function () {
+        me.moveUp();
+      },
+      false,
+    );
 
-  edit(){
-    console.log("Edit " + this.name);
+    return [moveUpButton, moveDownButton];
   }
 
   remove(){
-    this.node.remove();
+    this.currentNode.remove();
+    var i = this.nodes.indexOf(this.currentNode);
+    this.nodes.splice(i,1);
   }
 
   moveUp(){
-    var parent = this.node.parentElement;
+    var parent = this.currentNode.parentElement;
     if (parent.children.length != 1){
-      var index = Array.prototype.indexOf.call(parent.children, this.node);
+      var index = Array.prototype.indexOf.call(parent.children, this.currentNode);
       if (index != 0){
-        parent.removeChild(this.node);
-        parent.children[index - 1].before(this.display());
+        parent.removeChild(this.currentNode);
+        parent.children[index - 1].before(this.currentNode);
       }
     }
   }
 
   moveDown(){
-    var parent = this.node.parentElement;
+    var parent = this.currentNode.parentElement;
     if (parent.children.length != 1){
-      var index = Array.prototype.indexOf.call(parent.children, this.node);
+      var index = Array.prototype.indexOf.call(parent.children, this.currentNode);
       if (index != parent.children.length - 1){
-        parent.removeChild(this.node);
-        parent.children[index].after(this.display());
+        parent.removeChild(this.currentNode);
+        parent.children[index].after(this.currentNode);
       }
     }
   }

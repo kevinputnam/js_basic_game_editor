@@ -12,39 +12,42 @@ class Game extends GameContainer {
     this.first_scene = null;
     this.start_player_pos = [0,0];
 
-    var scene_sp = document.createElement('span')
-    this.scene_tv = document.createElement('div');
-    scene_sp.setAttribute('class','caret');
-    scene_sp.setAttribute('onclick','flipCaret(this)');
-    scene_sp.innerHTML = 'Scenes';
-    this.scene_tv.append(scene_sp)
-
-    this.sceneNodes = document.createElement('div');
-    this.sceneNodes.setAttribute('class','nested');
-    this.scene_tv.append(this.sceneNodes)
-    this.node.append(this.scene_tv);
   }
 
-  updateDisplay(){
-    this.nodeSpan.innerHTML = '<b>'+this.name+ ':</b> ' + this.description;
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = '<b>'+this.name+ ':</b> ' + this.description;
   }
 
   display() {
-    super.display();
+    var node = super.display();
 
+    console.log(node);
+    var thingNodes = this.getChildContainer(node,'things');
     if (this.things){
-      for (var [id,thing] of Object.entries(this.things)){
-        console.log(thing);
-        this.thingNodes.append(thing.display());
+      for (const [id,thing] of Object.entries(this.things)){
+        var thingNode = thing.display();
+        thingNodes.append(thingNode);
       }
     }
 
+    var scene_sp = document.createElement('span')
+    var scene_tv = document.createElement('div');
+    scene_sp.setAttribute('class','caret');
+    scene_sp.setAttribute('onclick','flipCaret(this)');
+    scene_sp.innerHTML = 'Scenes';
+    scene_tv.append(scene_sp)
+
+    var sceneNodes = document.createElement('div');
+    sceneNodes.setAttribute('class','nested scenes');
+    scene_tv.append(sceneNodes)
+    node.append(scene_tv);
     if (this.scenes){
       for (const [id,scene] of Object.entries(this.scenes)){
-        this.sceneNodes.append(scene.display());
+        var sceneNode = scene.display();
+        sceneNodes.append(sceneNode);
       }
     }
-    return this.node;
+    return node;
   }
 
   load(data) {
@@ -77,13 +80,13 @@ class Game extends GameContainer {
     data['first_scene'] = this.first_scene;
     data['start_player_pos'] = this.start_player_pos;
 
-    things = {}
+    var things = {}
     for (const [key,value] of Object.entries(this.things)){
       things[key] = value.save();
     }
     data['things'] = things;
 
-    scenes = {}
+    var scenes = {}
     for (const [key,value] of Object.entries(this.scenes)){
       scenes[key] = value.save();
     }
@@ -92,8 +95,8 @@ class Game extends GameContainer {
     return data;
   }
 
-  edit(){
-    super.edit();
+  edit(node){
+    super.edit(node);
     var editView = document.getElementById('editview');
   }
 }

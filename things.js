@@ -44,10 +44,10 @@ class Thing extends GameContainer {
     return data;
   }
 
-  edit(){
-    super.edit();
+  edit(node){
+    super.edit(node);
     var editView = document.getElementById('editview');
-    editView.append(this.removeButton,document.createElement('br'),document.createElement('br'));
+    editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
   }
 
   remove(){

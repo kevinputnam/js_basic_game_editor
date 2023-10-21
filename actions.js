@@ -24,8 +24,6 @@ class Action extends BuildingBlock{
     this.type = "Action";
     this.description = "Action";
     this.actions = null;
-    this.actionNodes = document.createElement('div');
-    this.node.append(this.actionNodes);
   }
 
   load(data) {
@@ -51,15 +49,28 @@ class Action extends BuildingBlock{
     return data;
   }
 
+  getChildContainer(parent,name){
+    for (const node of parent.childNodes){
+      console.log(node);
+      if (node.classList.contains(name)){
+        return node;
+      }
+    }
+  }
+
   display() {
-    super.display();
+    var node = super.display();
+
+    var actionNodes = document.createElement('div');
+    actionNodes.setAttribute('class','actions');
+    node.append(actionNodes);
 
     if (this.actions){
       for (var action of this.actions){
-        this.actionNodes.append(action.display());
+        actionNodes.append(action.display());
       }
     }
-    return this.node;
+    return node;
   }
 
   run(args) {
@@ -70,10 +81,12 @@ class Action extends BuildingBlock{
     var data = {'parent':this};
     var new_action = eval("new " + action_type + "(data)");
     this.actions.push(new_action);
-    this.actionNodes.append(new_action.display());
+    var actionNodes = this.getChildContainer(this.currentNode,'actions');
+    actionNodes.append(new_action.display());
   }
 
-  edit(){
+  edit(node){
+    super.edit(node);
     var editView = document.getElementById("editview");
     editView.replaceChildren();
 
@@ -85,7 +98,8 @@ class Action extends BuildingBlock{
     description.innerHTML = this.description;
     editView.append(title,description,document.createElement('br'));
 
-    editView.append(this.moveUpButton,this.moveDownButton,this.removeButton,document.createElement('br'),document.createElement('br'));
+    var moveButtons = this.createUpAndDownButtons();
+    editView.append(moveButtons[0],moveButtons[1],this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
 
     var me = this;
     if (this.actions){
@@ -111,7 +125,10 @@ class Action extends BuildingBlock{
   }
 
   remove(){
-    super.remove();
+    //super.remove();
+    for (const node of this.nodes){
+      node.remove();
+    }
     if(this.parent){
       this.parent.actions.splice(this.parent.actions.indexOf(this),1);
     }
@@ -173,12 +190,12 @@ class Action_set_var extends Action {
     return data;
   }
 
-  updateDisplay(){
-    this.nodeSpan.innerHTML = '<b>Set</b> $' + this.variable + ' <b>to</b> ' + this.value;
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = '<b>Set</b> $' + this.variable + ' <b>to</b> ' + this.value;
   }
 
-  edit() {
-    super.edit();
+  edit(node) {
+    super.edit(node);
     var me = this;
     var editView = document.getElementById("editview");
 
@@ -188,7 +205,7 @@ class Action_set_var extends Action {
     variableInputField.value = this.variable;
     variableInputField.addEventListener("change", (event)=> {
       me.variable = event.target.value;
-      me.updateDisplay();
+      me.updateNodes();
     })
 
 
@@ -198,7 +215,7 @@ class Action_set_var extends Action {
     valueInputField.value = this.value;
     valueInputField.addEventListener("change", (event)=> {
       me.value = event.target.value;
-      me.updateDisplay();
+      me.updateNodes();
     })
 
     editView.append(inputLabel,variableInputField,inputLabel2,valueInputField);
@@ -227,20 +244,20 @@ class Action_message extends Action {
     return data;
   }
 
-  updateDisplay(){
+  updateDisplay(nodeSpan){
     if (this.text_lines.length > 0){
       if (this.text_lines[0].length >= 21){
-        this.nodeSpan.innerHTML = '<b>Message</b> "' + this.text_lines[0].slice(0,20) + '..."';
+        nodeSpan.innerHTML = '<b>Message</b> "' + this.text_lines[0].slice(0,20) + '..."';
       }else{
-        this.nodeSpan.innerHTML = '<b>Message</b> "' + this.text_lines[0] + '"';
+        nodeSpan.innerHTML = '<b>Message</b> "' + this.text_lines[0] + '"';
       }
     }else{
-      this.nodeSpan.innerHTML = '<b>Message</b>';
+      nodeSpan.innerHTML = '<b>Message</b>';
     }
   }
 
-  edit(){
-    super.edit();
+  edit(node){
+    super.edit(node);
     var me = this;
     var editView = document.getElementById("editview");
 
@@ -257,7 +274,7 @@ class Action_message extends Action {
     messageInputField.value = text;
     messageInputField.addEventListener("change", (event)=> {
       me.text_lines = event.target.value.split('\n');
-      me.updateDisplay();
+      me.updateNodes();
     })
 
     editView.append(inputLabel,document.createElement("br"),messageInputField);
@@ -290,16 +307,16 @@ class Action_start_timer extends Action {
     return data;
   }
 
-  updateDisplay(){
+  updateDisplay(nodeSpan){
     if (this.variable.length > 0){
-      this.nodeSpan.innerHTML = '<b>Timer:</b> $' + this.variable;
+      nodeSpan.innerHTML = '<b>Timer:</b> $' + this.variable;
     } else {
-      this.nodeSpan.innerHTML = '<b>Timer:</b> ' + this.milliseconds + 'ms';
+      nodeSpan.innerHTML = '<b>Timer:</b> ' + this.milliseconds + 'ms';
     }
   }
 
-  edit(){
-    super.edit();
+  edit(node){
+    super.edit(node);
     var me = this;
     var editView = document.getElementById("editview");
 
@@ -310,7 +327,7 @@ class Action_start_timer extends Action {
     msInputField.value = this.milliseconds;
     msInputField.addEventListener("change", (event)=> {
       me.milliseconds = event.target.value;
-      me.updateDisplay();
+      me.updateNodes();
     })
 
     var inputLabel2 = document.createElement("label")
@@ -320,7 +337,7 @@ class Action_start_timer extends Action {
     varInputField.value = this.variable;
     varInputField.addEventListener("change", (event)=> {
       me.variable = event.target.value;
-      me.updateDisplay();
+      me.updateNodes();
     })
 
     editView.append(inputLabel,msInputField,inputLabel2,varInputField);
@@ -337,8 +354,8 @@ class Action_else extends Action {
     this.actions = [];
   }
 
-  updateDisplay(){
-    this.nodeSpan.innerHTML = '<b>else</b>';
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = '<b>else</b>';
   }
 }
 
@@ -374,8 +391,8 @@ class Action_if_eval extends Action {
     return data;
   }
 
-  updateDisplay(){
-    this.nodeSpan.innerHTML = '<b>if </b> ' + this.val1 + " <b>" + this.operator + "</b> " + this.val2
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = '<b>if </b> ' + this.val1 + " <b>" + this.operator + "</b> " + this.val2
   }
 
   run(){
@@ -388,8 +405,8 @@ class Action_if_eval extends Action {
     }
   }
 
-  edit(){
-    super.edit();
+  edit(node){
+    super.edit(node);
     var me = this;
     var editView = document.getElementById("editview");
 
@@ -400,7 +417,7 @@ class Action_if_eval extends Action {
     val1InputField.value = this.val1;
     val1InputField.addEventListener("change", (event)=> {
       me.val1 = event.target.value;
-      me.updateDisplay();
+      me.updateNodes();
     })
 
     var operatorSelector = document.createElement('select');
@@ -417,7 +434,7 @@ class Action_if_eval extends Action {
     }
     operatorSelector.addEventListener("change", (event)=> {
       me.operator = me.operators[event.target.value];
-      me.updateDisplay();
+      me.updateNodes();
     })
 
     var inputLabel2 = document.createElement("label")
@@ -427,7 +444,7 @@ class Action_if_eval extends Action {
     val2InputField.value = this.val2;
     val2InputField.addEventListener("change", (event)=> {
       me.val2 = event.target.value;
-      me.updateDisplay();
+      me.updateNodes();
     })
 
     editView.append(inputLabel1,val1InputField,operatorSelector,inputLabel2,val2InputField);

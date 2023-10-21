@@ -26,5 +26,5 @@ the_scene.things.push(0);
 game.scenes[the_scene.id] = the_scene;
 var gameview = document.getElementById('gamedata');
 gameview.replaceChildren(game.display());
-
+//console.log(JSON.stringify(game.save(),null,'  '));
 //sceneview.replaceChildren(if_action.display(),message.display(),timer.display());
