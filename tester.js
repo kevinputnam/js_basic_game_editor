@@ -1,30 +1,50 @@
-var game = new Game();
-game.name = "The Greatest Game in the World!"
-game.description = "Play the game for all the fun you never knew you needed."
-var the_thing = new Thing();
-var thing1 = new Thing();
-var thing2 = new Thing();
-var if_action = new Action_if_eval();
-if_action.load({name: "Action_if_eval", actions: [{name: "Action_message", actions: null, text_lines: ["Enough is enough, you craven fool!"]},{name: "Action_start_timer", actions: null, milliseconds: 0, variable: "global_timer"},{name: "Action_set_var", actions: null, variable: "global_timer", value: "500"}], val1: "$visits", val2: "3", operator: ">"});
-var message = new Action_message();
-var timer = new Action_start_timer();
-the_thing.name = 'First Thing';
-the_thing.description = 'The first thing we ever made!';
-the_thing.actions.push(if_action,message,timer);
-thing1.name = 'Rock';
-thing1.description = 'It might be granite?';
-thing2.name = 'Book';
-thing2.description = 'I, Robot by Isaac Asimov';
-game.things[the_thing.id]=the_thing;
-game.things[thing1.id]=thing1;
-game.things[thing2.id]=thing2;
-the_thing.things.push(1);
-var the_scene = new Scene();
-the_scene.name = "Logo Splash";
-the_scene.description = "First screen of the game."
-the_scene.things.push(0);
-game.scenes[the_scene.id] = the_scene;
-var gameview = document.getElementById('gamedata');
-gameview.replaceChildren(game.display());
-//console.log(JSON.stringify(game.save(),null,'  '));
-//sceneview.replaceChildren(if_action.display(),message.display(),timer.display());
+var game_files = ["game_data_0.json","game_data_1.json"];
+var game = null;
+var saveLink = null;
+
+function populate_game_picker(){
+  var gameselector = document.getElementById('gamefilepicker');
+  for (const gamefile of game_files){
+    var opt = new Option;
+    opt.value = gamefile;
+    opt.innerHTML = gamefile;
+    gameselector.appendChild(opt);
+  }
+}
+
+function get_game_data(){
+  var gameselector = document.getElementById('gamefilepicker');
+  fetch(gameselector.value).then(response => response.text()).then(respText => load_game(respText));
+}
+
+function load_game(text){
+  var jstuff = JSON.parse(text);
+  game = new Game();
+  game.load(jstuff);
+  var gameview = document.getElementById('gamedata');
+  gameview.replaceChildren(game.display());
+}
+
+function create_new_game(){
+  game = new Game();
+  var editView = document.getElementById('editview');
+  editView.replaceChildren();
+  var gameview = document.getElementById('gamedata');
+  gameview.replaceChildren(game.display());
+}
+
+function save_game(){
+  saveLink = null;
+  if (game){
+    var gameJSON = JSON.stringify(game.save(),null,'  ');
+    const downloadFile = new File([gameJSON], 'game_data.json');
+    var fileURL = URL.createObjectURL(downloadFile);
+    var saveLink = document.createElement('a');
+    saveLink.innerHTML = 'Download save game.'
+    saveLink.setAttribute('href',fileURL);
+    saveLink.setAttribute('id','download_link');
+    saveLink.setAttribute('download','game_data.json');
+    saveLink.click();
+  }
+}
+

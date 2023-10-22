@@ -59,14 +59,15 @@ class Game extends GameContainer {
     this.start_player_pos = data['start_player_pos'];
 
     this.things = {};
-    for (const thing_data of data['things']){
+    console.log(data['things']);
+    for (const [thing_id,thing_data] of Object.entries(data['things'])){
       var newThing = new Thing({'parent':this});
       newThing.load(thing_data);
       this.things[newThing.id] = newThing;
     }
 
     this.scenes = {};
-    for (const scene_data of data['scenes']){
+    for (const [scene_id,scene_data] of Object.entries(data['scenes'])){
       var newScene = new Scene({'parent':this});
       newScene.load(scene_data);
       this.scenes[newScene.id] = newScene;
@@ -93,6 +94,12 @@ class Game extends GameContainer {
     data['scenes'] = scenes;
 
     return data;
+  }
+
+  addNewThing(thing){
+    this.things[thing.id]=thing;
+    var thingNodes = this.getChildContainer(this.nodes[0],'things');
+    thingNodes.append(thing.display('game'));
   }
 
   edit(node){

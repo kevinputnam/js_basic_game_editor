@@ -9,6 +9,7 @@ class BuildingBlock {
         this.parent = data.parent;
       }
     }
+    this.type = 'BuildingBlock';
     this.name = 'undefined node';
     this.description = 'BuildingBlock';
     this.nodes = [];
@@ -29,6 +30,11 @@ class BuildingBlock {
   display(info) { //default display method
 
     var node = document.createElement("div");
+    var nodeName = this.type;
+    if (this.id || this.id == 0){
+      nodeName += '_' + this.id;
+    }
+    node.setAttribute('name',nodeName);
     node.setAttribute("class","treeNode");
     node.classList.add(info);
     var nodeSpan = document.createElement("span");
@@ -90,29 +96,36 @@ class BuildingBlock {
   }
 
   remove(){
+    //remove the node from the DOM
     this.currentNode.remove();
+
+    //remove the node from list of nodes this object tracks
     var i = this.nodes.indexOf(this.currentNode);
     this.nodes.splice(i,1);
   }
 
   moveUp(){
-    var parent = this.currentNode.parentElement;
-    if (parent.children.length != 1){
-      var index = Array.prototype.indexOf.call(parent.children, this.currentNode);
-      if (index != 0){
-        parent.removeChild(this.currentNode);
-        parent.children[index - 1].before(this.currentNode);
+    for (const node of this.nodes){
+      var parent = node.parentElement;
+      if (parent.children.length != 1){
+        var index = Array.prototype.indexOf.call(parent.children, node);
+        if (index != 0){
+          parent.removeChild(node);
+          parent.children[index - 1].before(node);
+        }
       }
     }
   }
 
   moveDown(){
-    var parent = this.currentNode.parentElement;
-    if (parent.children.length != 1){
-      var index = Array.prototype.indexOf.call(parent.children, this.currentNode);
-      if (index != parent.children.length - 1){
-        parent.removeChild(this.currentNode);
-        parent.children[index].after(this.currentNode);
+    for (const node of this.nodes){
+      var parent = node.parentElement;
+      if (parent.children.length != 1){
+        var index = Array.prototype.indexOf.call(parent.children, node);
+        if (index != parent.children.length - 1){
+          parent.removeChild(node);
+          parent.children[index].after(node);
+        }
       }
     }
   }

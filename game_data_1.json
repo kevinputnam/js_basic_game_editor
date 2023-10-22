@@ -1,0 +1,13 @@
+{
+  "name": "New Game",
+  "description": "My first attempt at creating a new game completely from scratch in the editor.",
+  "things": {},
+  "actions": [],
+  "author": "",
+  "first_scene": null,
+  "start_player_pos": [
+    0,
+    0
+  ],
+  "scenes": {}
+}

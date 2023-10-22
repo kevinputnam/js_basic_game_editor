@@ -125,10 +125,14 @@ class Action extends BuildingBlock{
   }
 
   remove(){
-    //super.remove();
+
+    // actions can only have one parent, so
+    // remove all the instances of this node
     for (const node of this.nodes){
       node.remove();
     }
+
+    // remove it from its parent's list of actions
     if(this.parent){
       this.parent.actions.splice(this.parent.actions.indexOf(this),1);
     }

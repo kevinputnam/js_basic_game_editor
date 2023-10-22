@@ -53,10 +53,42 @@ class Thing extends GameContainer {
     }
   }
 
+  getParentObjectOfNode(node){
+    var parentName = node.parentElement.parentElement.parentElement.getAttribute('name');
+    var parentNameBits = parentName.split("_");
+    var parentType = parentNameBits[0];
+    var parentID = parentNameBits[1];
+    var parent = null;
+    if (parentType == 'Thing'){
+      parent = game.things[parentID];
+    }else if (parentType == 'Scene'){
+      parent = game.scenes[parentID];
+    }
+    return parent;
+  }
+
   remove(){
-    super.remove();
-    if(this.parent){
-      this.parent.things.splice(this.parent.things.indexOf(this.id),1);
+    var parent = this.getParentObjectOfNode(this.currentNode);
+
+    // find all of the instances that have the same parent node
+    for (const node of this.nodes){
+      console.log(node);
+      if(!node.classList.contains('game')){
+        if(parent == this.getParentObjectOfNode(node)){
+
+          //remove the node from the DOM
+          node.remove();
+
+          //remove the node from list of nodes this object tracks
+          var i = this.nodes.indexOf(node);
+          this.nodes.splice(i,1);
+        }
+      }
+    }
+
+    // remove the thing id from its parent's list of things
+    if(parent){
+      parent.things.splice(parent.things.indexOf(this.id),1);
     }
     var editView = document.getElementById('editview');
     editView.replaceChildren();

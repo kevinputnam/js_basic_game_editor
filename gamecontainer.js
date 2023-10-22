@@ -131,10 +131,14 @@ class GameContainer extends BuildingBlock{
   newThing(){
     var data = {'parent':this};
     var newT = new Thing(data);
-    game.things[newT.id]=newT;
-    this.things.push(newT.id);
-    var thingNodes = this.getChildContainer(this.currentNode,'things');
-    thingNodes.append(newT.display());
+    if (this.type != 'Game'){
+      this.things.push(newT.id);
+      for (var node of this.nodes){
+        var thingNodes = this.getChildContainer(node,'things');
+       thingNodes.append(newT.display());
+      }
+    }
+    game.addNewThing(newT);
   }
 
   edit(node){
@@ -154,18 +158,20 @@ class GameContainer extends BuildingBlock{
     title.append(bold);
     editView.append(title,document.createElement('br'));
 
-    this.addThingSelector = this.buildThingSelector(game.things);
+    if (this.type!='Game'){
+      this.addThingSelector = this.buildThingSelector(game.things);
 
-    var thingAddBtn = document.createElement("button");
-    thingAddBtn.innerHTML = 'Add Thing';
-    thingAddBtn.addEventListener(
-      "click",
-      function () {
-        me.addThing(me.addThingSelector.value);
-      },
-      false,
-    );
-
+      var thingAddBtn = document.createElement("button");
+      thingAddBtn.innerHTML = 'Add Thing';
+      thingAddBtn.addEventListener(
+        "click",
+        function () {
+          me.addThing(me.addThingSelector.value);
+        },
+        false,
+      );
+      editView.append(this.addThingSelector,thingAddBtn)
+    }
     var newThingBtn = document.createElement('button');
     newThingBtn.innerHTML = "New Thing";
     newThingBtn.addEventListener(
@@ -176,7 +182,7 @@ class GameContainer extends BuildingBlock{
       false,
     );
 
-    editView.append(this.addThingSelector,thingAddBtn,newThingBtn,document.createElement('br'));
+    editView.append(newThingBtn,document.createElement('br'));
 
     if (this.actions){
       this.newActionSelector = document.createElement('select');

@@ -1,0 +1,119 @@
+{
+  "name": "The Greatest Game in the World!",
+  "description": "Play the game for all the fun you never knew you needed.",
+  "things": {
+    "0": {
+      "name": "First Thing",
+      "description": "The first thing we ever made!",
+      "things": [
+        1
+      ],
+      "actions": [
+        {
+          "name": "Action_if_eval",
+          "actions": [
+            {
+              "name": "Action_message",
+              "actions": null,
+              "text_lines": [
+                "Enough is enough, you craven fool!"
+              ]
+            },
+            {
+              "name": "Action_start_timer",
+              "actions": null,
+              "milliseconds": 0,
+              "variable": "global_timer"
+            },
+            {
+              "name": "Action_set_var",
+              "actions": null,
+              "variable": "global_timer",
+              "value": "500"
+            }
+          ],
+          "val1": "$visits",
+          "val2": "3",
+          "operator": ">"
+        },
+        {
+          "name": "Action_message",
+          "actions": null,
+          "text_lines": []
+        },
+        {
+          "name": "Action_start_timer",
+          "actions": null,
+          "milliseconds": 0,
+          "variable": ""
+        }
+      ],
+      "hidden": false,
+      "trigger": false,
+      "triggered": false,
+      "location": [
+        0,
+        0
+      ],
+      "dimensions": [
+        0,
+        0
+      ]
+    },
+    "1": {
+      "name": "Rock",
+      "description": "It might be granite?",
+      "things": [],
+      "actions": [],
+      "hidden": false,
+      "trigger": false,
+      "triggered": false,
+      "location": [
+        0,
+        0
+      ],
+      "dimensions": [
+        0,
+        0
+      ]
+    },
+    "2": {
+      "name": "Book",
+      "description": "I, Robot by Isaac Asimov",
+      "things": [],
+      "actions": [],
+      "hidden": false,
+      "trigger": false,
+      "triggered": false,
+      "location": [
+        0,
+        0
+      ],
+      "dimensions": [
+        0,
+        0
+      ]
+    }
+  },
+  "actions": [],
+  "author": "",
+  "first_scene": null,
+  "start_player_pos": [
+    0,
+    0
+  ],
+  "scenes": {
+    "0": {
+      "name": "Logo Splash",
+      "description": "First screen of the game.",
+      "things": [
+        0
+      ],
+      "actions": [],
+      "background": "",
+      "map_size": [],
+      "grid_size": null,
+      "collisions": []
+    }
+  }
+}
