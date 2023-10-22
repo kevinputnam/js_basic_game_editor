@@ -26,10 +26,11 @@ class BuildingBlock {
     nodeSpan.innerHTML = '<b>'+ this.name + ':</b> ' + this.description;
   }
 
-  display() { //default display method
+  display(info) { //default display method
 
     var node = document.createElement("div");
     node.setAttribute("class","treeNode");
+    node.classList.add(info);
     var nodeSpan = document.createElement("span");
     node.append(nodeSpan);
 

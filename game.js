@@ -25,7 +25,7 @@ class Game extends GameContainer {
     var thingNodes = this.getChildContainer(node,'things');
     if (this.things){
       for (const [id,thing] of Object.entries(this.things)){
-        var thingNode = thing.display();
+        var thingNode = thing.display('game');
         thingNodes.append(thingNode);
       }
     }

@@ -25,8 +25,8 @@ class GameContainer extends BuildingBlock{
   nodeSpan.innerHTML = '<b>'+this.name+'[' + this.id + ']:</b> ' + this.description;
   }
 
-  display() {
-    var node = super.display();
+  display(info) {
+    var node = super.display(info);
 
     var thing_sp = document.createElement('span')
     var thing_tv = document.createElement('div');

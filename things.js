@@ -46,8 +46,11 @@ class Thing extends GameContainer {
 
   edit(node){
     super.edit(node);
-    var editView = document.getElementById('editview');
-    editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
+    if (!node.classList.contains('game'))
+    {
+      var editView = document.getElementById('editview');
+      editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
+    }
   }
 
   remove(){

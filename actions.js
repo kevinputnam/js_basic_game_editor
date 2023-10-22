@@ -309,7 +309,7 @@ class Action_start_timer extends Action {
 
   updateDisplay(nodeSpan){
     if (this.variable.length > 0){
-      nodeSpan.innerHTML = '<b>Timer:</b> $' + this.variable;
+      nodeSpan.innerHTML = '<b>Timer:</b> $' + this.variable + ' ms';
     } else {
       nodeSpan.innerHTML = '<b>Timer:</b> ' + this.milliseconds + 'ms';
     }
