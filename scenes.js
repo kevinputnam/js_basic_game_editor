@@ -13,10 +13,7 @@ class Scene extends GameContainer {
     this.map_size = [];
     this.grid_size = null;
     this.collisions = [];
-  }
-
-  reset() {
-    Scene.next_id = 0;
+    this.canvasContext = null;
   }
 
   load(data) {
@@ -46,16 +43,17 @@ class Scene extends GameContainer {
     if (map){
       map.remove();
     }
-    if (this.background.length > 0){
-      var image = document.createElement('img');
-      image.setAttribute('src',this.background);
       const canvas = document.createElement("canvas");
       canvas.setAttribute('id','map');
       canvas.setAttribute('width','720');
       canvas.setAttribute('height','480');
       playView.append(canvas);
       const ctx = canvas.getContext("2d");
+      this.canvasContext = ctx;
 
+    if (this.background.length > 0){
+      var image = document.createElement('img');
+      image.setAttribute('src',this.background);
       image.addEventListener("load", (e) => {
         ctx.scale(2,2);
         ctx.drawImage(image, 0,0);

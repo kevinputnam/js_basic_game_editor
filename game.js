@@ -12,6 +12,7 @@ class Game extends GameContainer {
     this.first_scene = null;
     this.start_player_pos = [0,0];
     this.game = this;
+    this.screenDimensions = [360,240];
 
   }
 

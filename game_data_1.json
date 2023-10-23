@@ -1,7 +1,26 @@
 {
   "name": "New Game",
   "description": "My first attempt at creating a new game completely from scratch in the editor.",
-  "things": {},
+  "things": {
+    "0": {
+      "name": "Rock",
+      "description": "A big old rock.",
+      "things": [],
+      "actions": [],
+      "hidden": false,
+      "trigger": false,
+      "triggered": false,
+      "location": [
+        "130",
+        "130"
+      ],
+      "dimensions": [
+        0,
+        0
+      ],
+      "spritePath": "/assets/sprites/rock.png"
+    }
+  },
   "actions": [],
   "author": "",
   "first_scene": null,
@@ -9,5 +28,48 @@
     0,
     0
   ],
-  "scenes": {}
+  "scenes": {
+    "0": {
+      "name": "Logo",
+      "description": "logo",
+      "things": [],
+      "actions": [],
+      "background": "assets/backgrounds/logoscreen.bmp",
+      "map_size": [],
+      "grid_size": null,
+      "collisions": []
+    },
+    "1": {
+      "name": "Fandom Title",
+      "description": "Battletech",
+      "things": [],
+      "actions": [],
+      "background": "assets/backgrounds/titlescreen.bmp",
+      "map_size": [],
+      "grid_size": null,
+      "collisions": []
+    },
+    "2": {
+      "name": "Game Title",
+      "description": "Pirate's Bane",
+      "things": [],
+      "actions": [],
+      "background": "assets/backgrounds/jamie_grear.png",
+      "map_size": [],
+      "grid_size": null,
+      "collisions": []
+    },
+    "3": {
+      "name": "Campus",
+      "description": "The first game screen",
+      "things": [
+        0
+      ],
+      "actions": [],
+      "background": "assets/backgrounds/campus.png",
+      "map_size": [],
+      "grid_size": null,
+      "collisions": []
+    }
+  }
 }

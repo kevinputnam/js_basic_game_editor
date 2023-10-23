@@ -172,7 +172,7 @@ class GameContainer extends BuildingBlock{
       newSceneBtn.addEventListener(
         "click",
         function (){
-          me.newScene();
+          me.addNewScene();
         },
         false,
       );
