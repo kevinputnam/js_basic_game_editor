@@ -70,8 +70,10 @@ class Action extends BuildingBlock{
     var data = {'parent':this,'game':this.game};
     var new_action = eval("new " + action_type + "(data)");
     this.actions.push(new_action);
-    var actionNodes = this.getChildContainer(this.currentNode,'actions');
-    actionNodes.append(new_action.display());
+    for (const node of this.nodes){
+      var actionNodes = this.getChildContainer(node,'actions');
+      actionNodes.append(new_action.display());
+    }
   }
 
   edit(node){

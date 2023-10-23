@@ -110,7 +110,7 @@
         0
       ],
       "actions": [],
-      "background": "",
+      "background": "assets/backgrounds/jamie_grear.png",
       "map_size": [],
       "grid_size": null,
       "collisions": []

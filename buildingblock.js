@@ -57,7 +57,6 @@ class BuildingBlock {
 
   edit(node){
     this.currentNode = node;
-    console.log(this.currentNode);
   }
 
   createRemoveButton(){

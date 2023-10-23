@@ -22,7 +22,6 @@ class Game extends GameContainer {
   display() {
     var node = super.display();
 
-    console.log(node);
     var thingNodes = this.getChildContainer(node,'things');
     if (this.things){
       for (const [id,thing] of Object.entries(this.things)){
@@ -98,6 +97,13 @@ class Game extends GameContainer {
     data['scenes'] = scenes;
 
     return data;
+  }
+
+  addNewScene(){
+    var scene = new Scene({'parent':this,'game':this});
+    this.scenes[scene.id]=scene;
+    var sceneNodes = this.getChildContainer(this.nodes[0],'scenes');
+    sceneNodes.append(scene.display());
   }
 
   addNewThing(thing){

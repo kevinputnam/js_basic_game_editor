@@ -13,10 +13,13 @@ class GameContainer extends BuildingBlock{
   }
 
   getChildContainer(parent,name){
-    for (const node of parent.childNodes[1].childNodes){
-      console.log(node);
-      if (node.classList.contains(name)){
-        return node;
+    for (const child of parent.childNodes){
+      if (child.tagName == 'DIV'){
+        for (const grand of child.childNodes){
+          if (grand.classList.contains(name)){
+            return(grand);
+          }
+        }
       }
     }
   }
@@ -62,7 +65,6 @@ class GameContainer extends BuildingBlock{
     if (Array.isArray(this.things)){
       if (this.things){
         for (var thing_id of this.things){
-          console.log(this.game);
           this.game.things[thing_id].parent = this;
           thingNodes.append(this.game.things[thing_id].display());
         }
@@ -78,9 +80,7 @@ class GameContainer extends BuildingBlock{
     this.things = data['things'];
 
     if (this.actions){
-      console.log(data['actions']);
       for (const action of data['actions']){
-        console.log(action);
         var new_action = eval("new " + action['name'] + "({'parent':this,'game':this.game})");
         new_action.load(action);
         this.actions.push(new_action);
@@ -120,14 +120,19 @@ class GameContainer extends BuildingBlock{
     var data = {'parent':this,'game':this.game};
     var new_action = eval("new " + action_type + "(data)");
     this.actions.push(new_action);
-    var actionNodes = this.getChildContainer(this.currentNode,'actions');
-    actionNodes.append(new_action.display());
+    for (const node of this.nodes){
+      var actionNodes = this.getChildContainer(node,'actions');
+      actionNodes.append(new_action.display());
+    }
   }
 
   addThing(thing_id){
     this.things.push(thing_id);
-    var thingNodes = this.getChildContainer(this.currentNode,'things');
-    thingNodes.append(this.game.things[thing_id].display());
+    this.game.things[thing_id].parent = this;
+    for (const node of this.nodes){
+      var thingNodes = this.getChildContainer(node,'things');
+      thingNodes.append(this.game.things[thing_id].display());
+    }
   }
 
   newThing(){
@@ -159,6 +164,22 @@ class GameContainer extends BuildingBlock{
     }
     title.append(bold);
     editView.append(title,document.createElement('br'));
+
+    if (this.scenes){
+
+      var newSceneBtn = document.createElement('button');
+      newSceneBtn.innerHTML = "New Scene";
+      newSceneBtn.addEventListener(
+        "click",
+        function (){
+          me.newScene();
+        },
+        false,
+      );
+
+      editView.append(newSceneBtn,document.createElement('br'));
+    }
+
 
     if (this.type!='Game'){
       this.addThingSelector = this.buildThingSelector(this.game.things);

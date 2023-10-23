@@ -20,6 +20,10 @@ class Thing extends GameContainer {
 
   }
 
+  reset(){
+    Thing.next_id = 0;
+  }
+
   load(data) {
 
     super.load(data);
@@ -44,6 +48,13 @@ class Thing extends GameContainer {
     return data;
   }
 
+  showSprite(){
+    var playView = document.getElementById('mapview');
+    if (this.sprite){
+      console.log("Display sprite: " + this.sprite);
+    }
+  }
+
   edit(node){
     super.edit(node);
     if (!node.classList.contains('game'))
@@ -51,7 +62,6 @@ class Thing extends GameContainer {
       var editView = document.getElementById('editview');
       editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
     }
-    console.log(this.parent);
   }
 
   getParentObjectOfNode(node){
@@ -73,7 +83,6 @@ class Thing extends GameContainer {
 
     // find all of the instances that have the same parent node
     for (const node of this.nodes){
-      console.log(node);
       if(!node.classList.contains('game')){
         if(parent == this.getParentObjectOfNode(node)){
 

@@ -15,6 +15,10 @@ class Scene extends GameContainer {
     this.collisions = [];
   }
 
+  reset() {
+    Scene.next_id = 0;
+  }
+
   load(data) {
 
     super.load(data);
@@ -36,9 +40,51 @@ class Scene extends GameContainer {
     return data;
   }
 
+  updatePlayView(){
+    var playView = document.getElementById('mapview');
+    var map = document.getElementById('map');
+    if (map){
+      map.remove();
+    }
+    if (this.background.length > 0){
+      var image = document.createElement('img');
+      image.setAttribute('src',this.background);
+      const canvas = document.createElement("canvas");
+      canvas.setAttribute('id','map');
+      canvas.setAttribute('width','720');
+      canvas.setAttribute('height','480');
+      playView.append(canvas);
+      const ctx = canvas.getContext("2d");
+
+      image.addEventListener("load", (e) => {
+        ctx.scale(2,2);
+        ctx.drawImage(image, 0,0);
+      });
+
+    }
+    for (const thing of this.things){
+      this.game.things[thing].showSprite();
+    }
+  }
+
   edit(node){
     super.edit(node);
+    var me = this;
     var editView = document.getElementById('editview');
+
+    this.updatePlayView();
+
+    var inputLabel = document.createElement("label")
+    inputLabel.innerHTML = "Background image: ";
+
+    var imageFileInputField = createElementWithAttributes('input',{'type':'text','maxlength':'100','size':'60'});
+    imageFileInputField.value = this.background;
+    imageFileInputField.addEventListener("change", (event)=> {
+      me.background = event.target.value;
+      me.updatePlayView();
+    })
+
+    editView.append(inputLabel,imageFileInputField,document.createElement('br'));
     editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
   }
 

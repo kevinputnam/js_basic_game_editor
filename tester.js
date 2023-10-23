@@ -18,21 +18,19 @@ function get_game_data(){
 }
 
 function load_game(text){
+  reset();
+  var gameView = document.getElementById('gamedata');
   var jstuff = JSON.parse(text);
   game = new Game();
   game.load(jstuff);
-  var editView = document.getElementById('editview');
-  editView.replaceChildren();
-  var gameview = document.getElementById('gamedata');
-  gameview.replaceChildren(game.display());
+  gameView.replaceChildren(game.display());
 }
 
 function create_new_game(){
+  reset();
+  var gameView = document.getElementById('gamedata');
   game = new Game();
-  var editView = document.getElementById('editview');
-  editView.replaceChildren();
-  var gameview = document.getElementById('gamedata');
-  gameview.replaceChildren(game.display());
+  gameView.replaceChildren(game.display());
 }
 
 function save_game(){
@@ -50,3 +48,15 @@ function save_game(){
   }
 }
 
+function reset(){
+  var editView = document.getElementById('editview');
+  var gameView = document.getElementById('gamedata');
+
+  //need to set id counters to zero
+  Thing.next_id = 0;
+  Scene.next_id = 0;
+
+  game = null;
+  editView.replaceChildren();
+  gameView.replaceChildren();
+}
