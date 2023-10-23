@@ -4,9 +4,13 @@ class BuildingBlock {
 
   constructor(data) {
     this.parent = null;
+    this.game = null;
     if (data){
       if (data.parent){
         this.parent = data.parent;
+      }
+      if (data.game){
+        this.game = data.game;
       }
     }
     this.type = 'BuildingBlock';

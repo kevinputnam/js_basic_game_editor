@@ -51,6 +51,7 @@ class Thing extends GameContainer {
       var editView = document.getElementById('editview');
       editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
     }
+    console.log(this.parent);
   }
 
   getParentObjectOfNode(node){
@@ -60,9 +61,9 @@ class Thing extends GameContainer {
     var parentID = parentNameBits[1];
     var parent = null;
     if (parentType == 'Thing'){
-      parent = game.things[parentID];
+      parent = this.game.things[parentID];
     }else if (parentType == 'Scene'){
-      parent = game.scenes[parentID];
+      parent = this.game.scenes[parentID];
     }
     return parent;
   }
@@ -90,6 +91,7 @@ class Thing extends GameContainer {
     if(parent){
       parent.things.splice(parent.things.indexOf(this.id),1);
     }
+    this.parent = null;
     var editView = document.getElementById('editview');
     editView.replaceChildren();
   }

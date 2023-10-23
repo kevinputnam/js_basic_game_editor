@@ -62,7 +62,9 @@ class GameContainer extends BuildingBlock{
     if (Array.isArray(this.things)){
       if (this.things){
         for (var thing_id of this.things){
-          thingNodes.append(game.things[thing_id].display());
+          console.log(this.game);
+          this.game.things[thing_id].parent = this;
+          thingNodes.append(this.game.things[thing_id].display());
         }
       }
     }
@@ -79,7 +81,7 @@ class GameContainer extends BuildingBlock{
       console.log(data['actions']);
       for (const action of data['actions']){
         console.log(action);
-        var new_action = eval("new " + action['name'] + "({'parent':this})");
+        var new_action = eval("new " + action['name'] + "({'parent':this,'game':this.game})");
         new_action.load(action);
         this.actions.push(new_action);
       }
@@ -104,7 +106,7 @@ class GameContainer extends BuildingBlock{
   buildThingSelector(thingDict){
     var thingSelector = document.createElement('select');
     for (const [t_id,t] of Object.entries(thingDict)){
-      if (t_id != this.id){
+      if (t_id != this.id && t.parent == null){
         var opt = new Option;
         opt.value = t_id;
         opt.innerHTML = t.name + '['+t.id+']';
@@ -115,7 +117,7 @@ class GameContainer extends BuildingBlock{
   }
 
   addAction(action_type){
-    var data = {'parent':this};
+    var data = {'parent':this,'game':this.game};
     var new_action = eval("new " + action_type + "(data)");
     this.actions.push(new_action);
     var actionNodes = this.getChildContainer(this.currentNode,'actions');
@@ -125,11 +127,11 @@ class GameContainer extends BuildingBlock{
   addThing(thing_id){
     this.things.push(thing_id);
     var thingNodes = this.getChildContainer(this.currentNode,'things');
-    thingNodes.append(game.things[thing_id].display());
+    thingNodes.append(this.game.things[thing_id].display());
   }
 
   newThing(){
-    var data = {'parent':this};
+    var data = {'parent':this,'game':this.game};
     var newT = new Thing(data);
     if (this.type != 'Game'){
       this.things.push(newT.id);
@@ -138,7 +140,7 @@ class GameContainer extends BuildingBlock{
        thingNodes.append(newT.display());
       }
     }
-    game.addNewThing(newT);
+    this.game.addNewThing(newT);
   }
 
   edit(node){
@@ -159,7 +161,7 @@ class GameContainer extends BuildingBlock{
     editView.append(title,document.createElement('br'));
 
     if (this.type!='Game'){
-      this.addThingSelector = this.buildThingSelector(game.things);
+      this.addThingSelector = this.buildThingSelector(this.game.things);
 
       var thingAddBtn = document.createElement("button");
       thingAddBtn.innerHTML = 'Add Thing';

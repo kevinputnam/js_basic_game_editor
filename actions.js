@@ -1,15 +1,4 @@
-function actionFactory(action_list){
-  if (!action_list){
-    return [];
-  }
-  var actions = []
-  for (a_data of action_list){
-    var action = new Action(a_data);
-    action.actions = actionFactory(a_data.actions);
-    actions.push(action);
-  }
-  return actions;
-}
+
 
 //register actions here, for add method.
 const action_types = ['Action_else','Action_if_eval','Action_message','Action_start_timer','Action_set_var'];
@@ -29,7 +18,7 @@ class Action extends BuildingBlock{
   load(data) {
     if (this.actions){
       for (const action of data['actions']){
-        var new_action = eval("new " + action['name'] + "({'parent':this})");
+        var new_action = eval("new " + action['name'] + "({'parent':this,'game':this.game})");
         new_action.load(action);
         this.actions.push(new_action);
       }
@@ -78,7 +67,7 @@ class Action extends BuildingBlock{
   }
 
   add(action_type){
-    var data = {'parent':this};
+    var data = {'parent':this,'game':this.game};
     var new_action = eval("new " + action_type + "(data)");
     this.actions.push(new_action);
     var actionNodes = this.getChildContainer(this.currentNode,'actions');

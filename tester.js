@@ -21,6 +21,8 @@ function load_game(text){
   var jstuff = JSON.parse(text);
   game = new Game();
   game.load(jstuff);
+  var editView = document.getElementById('editview');
+  editView.replaceChildren();
   var gameview = document.getElementById('gamedata');
   gameview.replaceChildren(game.display());
 }
