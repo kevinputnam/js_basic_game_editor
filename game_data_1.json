@@ -19,6 +19,42 @@
         0
       ],
       "spritePath": "/assets/sprites/rock.png"
+    },
+    "1": {
+      "name": "Key Card",
+      "description": "Maybe try to open a door with it?",
+      "things": [],
+      "actions": [],
+      "hidden": false,
+      "trigger": false,
+      "triggered": false,
+      "location": [
+        "30",
+        "200"
+      ],
+      "dimensions": [
+        0,
+        0
+      ],
+      "spritePath": "assets/sprites/access_card.png"
+    },
+    "2": {
+      "name": "Dog",
+      "description": "Boy, is that dog cute!",
+      "things": [],
+      "actions": [],
+      "hidden": false,
+      "trigger": false,
+      "triggered": false,
+      "location": [
+        "40",
+        "40"
+      ],
+      "dimensions": [
+        0,
+        0
+      ],
+      "spritePath": "assets/sprites/dog.png"
     }
   },
   "actions": [],
@@ -63,7 +99,9 @@
       "name": "Campus",
       "description": "The first game screen",
       "things": [
-        0
+        0,
+        1,
+        2
       ],
       "actions": [],
       "background": "assets/backgrounds/campus.png",

@@ -111,6 +111,7 @@ class Game extends GameContainer {
     this.things[thing.id]=thing;
     var thingNodes = this.getChildContainer(this.nodes[0],'things');
     thingNodes.append(thing.display('game'));
+    this.edit(this.currentNode);
   }
 
   edit(node){

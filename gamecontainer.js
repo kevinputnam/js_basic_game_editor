@@ -133,6 +133,7 @@ class GameContainer extends BuildingBlock{
       var thingNodes = this.getChildContainer(node,'things');
       thingNodes.append(this.game.things[thing_id].display());
     }
+    this.edit(this.currentNode);
   }
 
   newThing(){
@@ -146,6 +147,7 @@ class GameContainer extends BuildingBlock{
       }
     }
     this.game.addNewThing(newT);
+    this.edit(this.currentNode);
   }
 
   edit(node){

@@ -56,6 +56,7 @@ class Scene extends GameContainer {
       image.setAttribute('src',this.background);
       image.addEventListener("load", (e) => {
         ctx.scale(2,2);
+        ctx.imageSmoothingEnabled = false;
         ctx.drawImage(image, 0,0);
       });
 

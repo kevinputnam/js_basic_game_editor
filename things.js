@@ -130,26 +130,21 @@ class Thing extends GameContainer {
   }
 
   remove(){
-    var parent = this.getParentObjectOfNode(this.currentNode);
-
     // find all of the instances that have the same parent node
+    var new_nodes = [];
     for (const node of this.nodes){
       if(!node.classList.contains('game')){
-        if(parent == this.getParentObjectOfNode(node)){
-
-          //remove the node from the DOM
-          node.remove();
-
-          //remove the node from list of nodes this object tracks
-          var i = this.nodes.indexOf(node);
-          this.nodes.splice(i,1);
-        }
+        //remove the node from the DOM
+        node.remove();
+      }else{
+        new_nodes.push(node); //only add the game node to list of nodes;
       }
     }
 
+    this.nodes = new_nodes;
     // remove the thing id from its parent's list of things
-    if(parent){
-      parent.things.splice(parent.things.indexOf(this.id),1);
+    if(this.parent){
+      this.parent.things.splice(this.parent.things.indexOf(this.id),1);
     }
     this.parent = null;
     var editView = document.getElementById('editview');
