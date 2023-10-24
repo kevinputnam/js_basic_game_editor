@@ -49,7 +49,9 @@ function save_game(){
 }
 
 function run_game(){
-  console.log('Do some stuff.');
+  if(game){
+    game.run();
+  }
 }
 
 function reset(){

@@ -17,7 +17,19 @@ class Game extends GameContainer {
     this.playContext = null;
     this.currentScene = null;
     this.createPlayContext();
+    this.runStack = [];
+    this.variables = {};
   }
+
+  run(args){
+
+    this.runStack = this.runStack.concat(this.actions);
+    this.scenes[this.first_scene].run();
+    for (var action of this.runStack){
+      action.run();
+    }
+  }
+
 
   createPlayContext(){
     var playView = document.getElementById('mapview');
@@ -42,7 +54,6 @@ class Game extends GameContainer {
       for (const thing_id of this.currentScene.things){
         var thing = game.things[thing_id];
         if (thing.spriteImage){
-          console.log(thing.spriteImage);
           this.playContext.drawImage(thing.spriteImage,thing.location[0],thing.location[1]);
         }
       }
@@ -150,6 +161,27 @@ class Game extends GameContainer {
 
   edit(node){
     super.edit(node);
+    var me = this;
     var editView = document.getElementById('editview');
+
+    var sceneLabel = document.createElement('label');
+    sceneLabel.innerHTML = '<b>First scene: <b>';
+
+    var startSceneSelector = document.createElement('select');
+    for (const [s_id,s] of Object.entries(this.scenes)){
+    var opt = new Option;
+    opt.value = s_id;
+    opt.innerHTML = s.name + '['+s.id+']';
+    startSceneSelector.appendChild(opt);
+    startSceneSelector.addEventListener(
+        "change",
+        function () {
+          me.first_scene = startSceneSelector.value;
+        },
+        false,
+      );
+    }
+    startSceneSelector.value = this.first_scene;
+    editView.append(sceneLabel,startSceneSelector);
   }
 }

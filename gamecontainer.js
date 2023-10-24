@@ -103,6 +103,10 @@ class GameContainer extends BuildingBlock{
     return data;
   }
 
+  run(args){
+    this.game.runStack = this.game.runStack.concat(this.actions);
+  }
+
   buildThingSelector(thingDict){
     var thingSelector = document.createElement('select');
     for (const [t_id,t] of Object.entries(thingDict)){

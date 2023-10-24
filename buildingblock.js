@@ -20,6 +20,10 @@ class BuildingBlock {
     this.currentNode = null;
   }
 
+  run(args) {
+    console.log("Running " + this.type + "[" + this.name + "]");
+  }
+
   updateNodes() {
     for (const node of this.nodes){
       var nodeSpan = node.firstChild;

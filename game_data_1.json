@@ -57,9 +57,16 @@
       "spritePath": "assets/sprites/dog.png"
     }
   },
-  "actions": [],
+  "actions": [
+    {
+      "name": "Action_set_var",
+      "actions": null,
+      "variable": "default_timer",
+      "value": "500"
+    }
+  ],
   "author": "",
-  "first_scene": null,
+  "first_scene": "0",
   "start_player_pos": [
     0,
     0
@@ -69,7 +76,14 @@
       "name": "Logo",
       "description": "logo",
       "things": [],
-      "actions": [],
+      "actions": [
+        {
+          "name": "Action_start_timer",
+          "actions": null,
+          "milliseconds": 0,
+          "variable": "default_timer"
+        }
+      ],
       "background": "assets/backgrounds/logoscreen.bmp",
       "map_size": [],
       "grid_size": null,

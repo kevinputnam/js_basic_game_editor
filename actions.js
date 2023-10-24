@@ -172,6 +172,11 @@ class Action_set_var extends Action {
     this.value = null;
   }
 
+  run(args){
+    this.game.variables[this.variable] = this.value;
+    console.log("Setting " + this.variable + " to " + this.value);
+  }
+
   load(data){
     super.load(data);
     this.variable = data['variable'];
@@ -287,6 +292,14 @@ class Action_start_timer extends Action {
 
     this.milliseconds = 0;
     this.variable = '';
+  }
+
+  run(args){
+    if (this.variable.length > 0){
+      console.log("Starting timer for " + this.game.variables[this.variable] + "ms");
+    } else {
+      console.log("Starting timer for " + this.milliseconds + "ms");
+    }
   }
 
   load(data){
