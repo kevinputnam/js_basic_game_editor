@@ -48,6 +48,10 @@ function save_game(){
   }
 }
 
+function run_game(){
+  console.log('Do some stuff.');
+}
+
 function reset(){
   var editView = document.getElementById('editview');
   var gameView = document.getElementById('gamedata');

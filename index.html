@@ -1,12 +1,14 @@
 <html>
 <head>
     <link rel="stylesheet" href="main.css">
+    <title>Adventure Game Editor</title>
 </head>
 <body>
     <select id="gamefilepicker" ></select>
     <button type="button" onclick="get_game_data()">Load</button>
-    <button type="button" onclick="create_new_game()">New</button>
     <button type="button" id="savebutton" onclick="save_game()">Save</button>
+    <button type="button" onclick="create_new_game()">New</button>
+    <button type="button" onclick="run_game()">Run</button>
     <div id="editor" class="editor">
         <div id="gameview">
             <h2><span id="gametitle">Game Data<span></h2>

@@ -10,21 +10,28 @@ class Scene extends GameContainer {
     this.type = "Scene";
 
     this.background = "";
+    this.backgroundImage = null;
     this.map_size = [];
     this.grid_size = null;
     this.collisions = [];
-    this.canvasContext = null;
   }
 
   load(data) {
 
     super.load(data);
 
+    var me = this;
     this.background = data['background'];
+    if(this.background){
+      this.backgroundImage = document.createElement('img');
+      this.backgroundImage.setAttribute('src',this.background);
+      this.backgroundImage.addEventListener("load", (e) => {
+        me.game.updatePlayView();
+      });
+    }
     this.map_size = data['map_size'];
     this.grid_size = data['grid_size'];
     this.collisions = data['collisions'];
-
   }
 
   save() {
@@ -37,53 +44,33 @@ class Scene extends GameContainer {
     return data;
   }
 
-  updatePlayView(){
-    var playView = document.getElementById('mapview');
-    var map = document.getElementById('map');
-    if (map){
-      map.remove();
-    }
-      const canvas = document.createElement("canvas");
-      canvas.setAttribute('id','map');
-      canvas.setAttribute('width','720');
-      canvas.setAttribute('height','480');
-      playView.append(canvas);
-      const ctx = canvas.getContext("2d");
-      this.canvasContext = ctx;
-
-    if (this.background.length > 0){
-      var image = document.createElement('img');
-      image.setAttribute('src',this.background);
-      image.addEventListener("load", (e) => {
-        ctx.scale(2,2);
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(image, 0,0);
-      });
-
-    }
-    for (const thing of this.things){
-      this.game.things[thing].showSprite();
-    }
-  }
-
   edit(node){
     super.edit(node);
+    this.game.currentScene = this;
     var me = this;
     var editView = document.getElementById('editview');
 
-    this.updatePlayView();
+    this.game.updatePlayView();
 
     var inputLabel = document.createElement("label")
     inputLabel.innerHTML = "Background image: ";
+
+    var backgroundThumbnail = document.createElement('img');
+    backgroundThumbnail.setAttribute('style','width:100;');
+    if(this.background){
+      backgroundThumbnail.setAttribute('src',this.background);
+    }
 
     var imageFileInputField = createElementWithAttributes('input',{'type':'text','maxlength':'100','size':'60'});
     imageFileInputField.value = this.background;
     imageFileInputField.addEventListener("change", (event)=> {
       me.background = event.target.value;
-      me.updatePlayView();
+      backgroundThumbnail.setAttribute('src',event.target.value);
+      me.backgroundImage.setAttribute('src',event.target.value);
     })
 
-    editView.append(inputLabel,imageFileInputField,document.createElement('br'));
+
+    editView.append(inputLabel,imageFileInputField,document.createElement('br'),backgroundThumbnail,document.createElement('br'));
     editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
   }
 

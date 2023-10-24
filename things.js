@@ -14,7 +14,7 @@ class Thing extends GameContainer {
     this.trigger = false;
     this.triggered = false;
 
-    this.sprite= null; //TODO define sprite object using building block
+    this.spriteImage= null;
     this.spritePath = "";
     this.location = [0,0];
     this.dimensions = [0,0];
@@ -24,6 +24,7 @@ class Thing extends GameContainer {
 
     super.load(data);
 
+    var me = this;
     this.hidden = data['hidden'];
     this.trigger = data['trigger'];
     this.triggered = data['triggered'];
@@ -32,6 +33,13 @@ class Thing extends GameContainer {
     this.location = data['location'];
     this.dimensions = data['dimensions'];
     this.spritePath = data['spritePath'];
+    if(this.spritePath){
+      this.spriteImage = document.createElement('img');
+      this.spriteImage.setAttribute('src',this.spritePath);
+      this.spriteImage.addEventListener("load", (e) => {
+        me.game.updatePlayView();
+      });
+    }
   }
 
   save() {
@@ -79,12 +87,18 @@ class Thing extends GameContainer {
     var inputLabel = document.createElement("label")
     inputLabel.innerHTML = "Sprite image: ";
 
+    var spriteThumbnail = document.createElement('img');
+    spriteThumbnail.setAttribute('style','width:30;');
+    if(this.spritePath){
+      spriteThumbnail.setAttribute('src',this.spritePath);
+    }
+
     var imageFileInputField = createElementWithAttributes('input',{'type':'text','maxlength':'100','size':'60'});
     imageFileInputField.value = this.spritePath;
     imageFileInputField.addEventListener("change", (event)=> {
       me.spritePath = event.target.value;
-      me.updateSprite();
-      me.showSprite();
+      spriteThumbnail.setAttribute('src',event.target.value);
+      me.spriteImage.setAttribute('src',event.target.value);
     })
 
     editView.append(inputLabel,imageFileInputField,document.createElement('br'))
@@ -96,17 +110,17 @@ class Thing extends GameContainer {
     xInputField.value = this.location[0];
     xInputField.addEventListener("change", (event)=> {
       me.location[0] = event.target.value;
-      me.showSprite();
+      me.game.updatePlayView();
     })
 
     var yInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':this.game.screenDimensions[1]});
     yInputField.value = this.location[1];
     yInputField.addEventListener("change", (event)=> {
       me.location[1] = event.target.value;
-      me.showSprite();
+      me.game.updatePlayView();
     })
 
-    editView.append(inputLabel2,xInputField,yInputField,document.createElement('br'));
+    editView.append(inputLabel2,xInputField,yInputField,document.createElement('br'),spriteThumbnail,document.createElement('br'));
 
     if (!node.classList.contains('game'))
     {

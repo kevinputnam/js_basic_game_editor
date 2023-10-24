@@ -13,7 +13,39 @@ class Game extends GameContainer {
     this.start_player_pos = [0,0];
     this.game = this;
     this.screenDimensions = [360,240];
+    this.canvas = null;
+    this.playContext = null;
+    this.currentScene = null;
+  }
 
+  createPlayContext(){
+    var playView = document.getElementById('mapview');
+    if (this.canvas){
+      this.playContext.remove;
+      this.canvas.remove;
+    }
+    this.canvas = document.createElement("canvas");
+    this.canvas.setAttribute('id','map');
+    this.canvas.setAttribute('width','720');
+    this.canvas.setAttribute('height','480');
+    playView.append(this.canvas);
+    this.playContext = this.canvas.getContext("2d");
+    this.playContext.scale(2,2);
+    this.playContext.imageSmoothingEnabled = false;
+  }
+
+  updatePlayView(){
+    if (this.currentScene){
+      this.playContext.drawImage(this.currentScene.backgroundImage, 0,0);
+
+      for (const thing_id of this.currentScene.things){
+        var thing = game.things[thing_id];
+        if (thing.spriteImage){
+          console.log(thing.spriteImage);
+          this.playContext.drawImage(thing.spriteImage,thing.location[0],thing.location[1]);
+        }
+      }
+    }
   }
 
   updateDisplay(nodeSpan){
@@ -76,7 +108,7 @@ class Game extends GameContainer {
       newScene.load(scene_data);
       this.scenes[newScene.id] = newScene;
     }
-
+    this.createPlayContext();
   }
 
   save() {
