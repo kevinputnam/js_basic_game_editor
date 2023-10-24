@@ -25,7 +25,8 @@ class Game extends GameContainer {
 
     this.runStack = this.runStack.concat(this.actions);
     this.scenes[this.first_scene].run();
-    for (var action of this.runStack){
+    while(this.runStack.length > 0){
+      var action = this.runStack.pop();
       action.run();
     }
   }
