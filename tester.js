@@ -55,6 +55,9 @@ function run_game(){
 function reset(){
   var editView = document.getElementById('editview');
   var gameView = document.getElementById('gamedata');
+  var mapView = document.getElementById('mapview');
+
+  mapView.replaceChildren();
 
   //need to set id counters to zero
   Thing.next_id = 0;

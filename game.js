@@ -16,6 +16,7 @@ class Game extends GameContainer {
     this.canvas = null;
     this.playContext = null;
     this.currentScene = null;
+    this.createPlayContext();
   }
 
   createPlayContext(){
@@ -45,6 +46,8 @@ class Game extends GameContainer {
           this.playContext.drawImage(thing.spriteImage,thing.location[0],thing.location[1]);
         }
       }
+    }else{
+      this.playContext.clearRect(0,0,this.screenDimensions[0],this.screenDimensions[1]);
     }
   }
 
@@ -108,7 +111,6 @@ class Game extends GameContainer {
       newScene.load(scene_data);
       this.scenes[newScene.id] = newScene;
     }
-    this.createPlayContext();
   }
 
   save() {

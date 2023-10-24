@@ -163,6 +163,7 @@ class Thing extends GameContainer {
     this.parent = null;
     var editView = document.getElementById('editview');
     editView.replaceChildren();
+    this.game.updatePlayView();
   }
 
 }

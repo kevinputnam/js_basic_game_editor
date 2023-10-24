@@ -77,9 +77,11 @@ class Scene extends GameContainer {
   remove(){
     super.remove();
     if(this.parent){
-      this.parent.scenes.splice(this.parent.scenes.indexOf(this.id),1);
+      delete this.parent.scenes[this.id];
     }
     var editView = document.getElementById('editview');
     editView.replaceChildren();
+    this.game.currentScene = null;
+    this.game.updatePlayView();
   }
 }
