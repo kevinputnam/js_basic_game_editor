@@ -50,7 +50,9 @@ function save_game(){
 
 function run_game(){
   if(game){
+    //disable editing
     game.run();
+    //re-enable editing
   }
 }
 

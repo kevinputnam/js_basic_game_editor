@@ -163,7 +163,7 @@ class GameContainer extends BuildingBlock{
 
     var title = document.createElement("span");
     var bold = document.createElement("b");
-    if (this.id){
+    if (this.id || this.id==0){
       bold.innerHTML = this.type + ': ' + this.name + '<br>ID:' + this.id + '<br>';
     }else{
       bold.innerHTML = this.type + ': ' + this.name + '<br>';

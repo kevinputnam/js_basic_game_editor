@@ -17,8 +17,12 @@ class Scene extends GameContainer {
   }
 
   load(data) {
-
     super.load(data);
+
+    if ('id' in data){
+      this.id = data['id'];
+      Scene.next_id = this.id + 1;
+    }
 
     var me = this;
     this.background = data['background'];
@@ -36,6 +40,7 @@ class Scene extends GameContainer {
 
   save() {
     var data = super.save();
+    data['id'] = this.id;
     data['background'] = this.background;
     data['map_size'] = this.map_size;
     data['grid_size'] = this.grid_size;

@@ -21,8 +21,12 @@ class Thing extends GameContainer {
   }
 
   load(data) {
-
     super.load(data);
+
+    if ('id' in data){
+      this.id = data['id'];
+      Thing.next_id = this.id + 1;
+    }
 
     var me = this;
     this.hidden = data['hidden'];
@@ -44,6 +48,7 @@ class Thing extends GameContainer {
 
   save() {
     var data = super.save();
+    data['id'] = this.id;
     data['hidden'] = this.hidden;
     data['trigger'] = this.trigger;
     data['triggered'] = this.triggered;
@@ -61,22 +66,6 @@ class Thing extends GameContainer {
       }
     }
     return null;
-  }
-
-  showSprite(){
-    var me = this;
-    var canvasContext = this.getParentCanvasContext();
-    if (this.spritePath){
-      if(canvasContext) {
-        if (this.spritePath.length > 0){
-          var image = document.createElement('img');
-          image.setAttribute('src',this.spritePath);
-          image.addEventListener("load", (e) => {
-            canvasContext.drawImage(image, me.location[0],me.location[1]);
-          });
-        }
-      }
-    }
   }
 
   edit(node){
