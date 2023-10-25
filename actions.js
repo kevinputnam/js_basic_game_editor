@@ -292,6 +292,18 @@ class Action_message extends Action {
     this.text_lines = [];
   }
 
+  run(args){
+    this.game.currentMessage = this.text_lines;
+    this.game.buttonBindings['dismiss'] = this;
+    this.game.runStackPaused = true;
+  }
+
+  dismissButton(args){
+    this.game.runStackPaused = false;
+    this.game.currentMessage = null;
+    this.game.buttonBindings = this.game.defaultButtonBindings;
+  }
+
   load(data){
     super.load(data);
     this.text_lines = data['text_lines'];

@@ -2,6 +2,11 @@ var game_files = ["game_data_0.json","game_data_1.json"];
 var game = null;
 var saveLink = null;
 
+var savebtn = document.getElementById('savebutton');
+var loadbtn = document.getElementById('loadbutton');
+var newbtn  = document.getElementById('newbutton');
+var runbtn  = document.getElementById('runbutton');
+
 function populate_game_picker(){
   var gameselector = document.getElementById('gamefilepicker');
   for (const gamefile of game_files){
@@ -50,10 +55,33 @@ function save_game(){
 
 function run_game(){
   if(game){
+    args = {};
+    args['disable_editing'] = disable_editing;
+    args['enable_editing'] = enable_editing;
     //disable editing
-    game.run();
+    game.run(args);
     //re-enable editing
   }
+}
+
+function stop_game(){
+  if(game){
+    game.stop();
+  }
+}
+
+function disable_editing(){
+  loadbtn.disabled = true;
+  savebtn.disabled = true;
+  newbtn.disabled = true;
+  runbtn.disabled = true;
+}
+
+function enable_editing(){
+  loadbtn.disabled = false;
+  savebtn.disabled = false;
+  newbtn.disabled = false;
+  runbtn.disabled = false;
 }
 
 function reset(){

@@ -87,13 +87,6 @@
           "variable": "default_timer"
         },
         {
-          "name": "Action_message",
-          "actions": null,
-          "text_lines": [
-            "Did the timer actually work?"
-          ]
-        },
-        {
           "name": "Action_change_scene",
           "actions": null,
           "scene_id": "1",
@@ -113,7 +106,23 @@
       "name": "Fandom Title",
       "description": "Battletech",
       "things": [],
-      "actions": [],
+      "actions": [
+        {
+          "name": "Action_start_timer",
+          "actions": null,
+          "milliseconds": 0,
+          "variable": "default_timer"
+        },
+        {
+          "name": "Action_change_scene",
+          "actions": null,
+          "scene_id": "2",
+          "player_pos": [
+            0,
+            0
+          ]
+        }
+      ],
       "id": 1,
       "background": "assets/backgrounds/titlescreen.bmp",
       "map_size": [],
@@ -124,7 +133,23 @@
       "name": "Game Title",
       "description": "Pirate's Bane",
       "things": [],
-      "actions": [],
+      "actions": [
+        {
+          "name": "Action_start_timer",
+          "actions": null,
+          "milliseconds": 0,
+          "variable": "default_timer"
+        },
+        {
+          "name": "Action_change_scene",
+          "actions": null,
+          "scene_id": "3",
+          "player_pos": [
+            0,
+            0
+          ]
+        }
+      ],
       "id": 2,
       "background": "assets/backgrounds/jamie_grear.png",
       "map_size": [],
@@ -139,7 +164,31 @@
         1,
         2
       ],
-      "actions": [],
+      "actions": [
+        {
+          "name": "Action_message",
+          "actions": null,
+          "text_lines": [
+            "         Welcome to",
+            "   Battletech: Pirate's Bane",
+            "",
+            "You are Jamie Grear. Captured by",
+            "pirates, you must escape, find",
+            "your destiny, and have a little",
+            "fun along the way.",
+            ""
+          ]
+        },
+        {
+          "name": "Action_message",
+          "actions": null,
+          "text_lines": [
+            "Explore the world, learn things,",
+            "make friends, and eventually",
+            "deal with those pesky pirates."
+          ]
+        }
+      ],
       "id": 3,
       "background": "assets/backgrounds/campus.png",
       "map_size": [],

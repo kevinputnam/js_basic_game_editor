@@ -16,29 +16,104 @@ class Game extends GameContainer {
     this.canvas = null;
     this.playContext = null;
     this.currentScene = null;
+    this.messageBoxDimensions = [200,100];
+    this.textFontSize = 10;
+    this.textFont = this.textFontSize + "px courier";
+    this.currentMessage = null;
     this.createPlayContext();
     this.runStack = [];
     this.variables = {};
     this.runStackPaused = false;
     this.stackRunnerInterval = null;
-    this.stopRunStack = false;
+    this.running = false;
+    this.disable_editing = null;
+    this.enable_editing = null;
+    this.currentAction = null;
+    this.controlKeys = ["ArrowDown","ArrowUp","ArrowLeft","ArrowRight","a","s"];
+    this.defaultButtonBindings = {'up':this,'down':this,'left':this,'right':this,'menu':this,'dismiss':this};
+    this.buttonBindings = this.defaultButtonBindings;
+  }
+
+  moveButton(direction){
+    console.log("move " + direction);
+  }
+
+  menuButton(){
+    console.log("open menu");
+  }
+
+  dismissButton(){
+    console.log("do nothing");
+  }
+
+  handleEvent(event){
+    if (event.type == "keydown"){
+      if (event.defaultPrevented){
+        return;
+      }
+      if(this.controlKeys.includes(event.key)){
+        switch (event.key) {
+          case "ArrowDown":
+            this.buttonBindings['down'].moveButton('down');
+            break;
+          case "ArrowUp":
+            this.buttonBindings['up'].moveButton('up');
+            break;
+          case "ArrowLeft":
+            this.buttonBindings['left'].moveButton('left');
+            break;
+          case "ArrowRight":
+            this.buttonBindings['right'].moveButton('right');
+            break;
+          case "a":
+            this.buttonBindings['menu'].menuButton();
+            break;
+          case "s":
+            this.buttonBindings['dismiss'].dismissButton();
+            break;
+          default:
+            return; // Quit when this doesn't handle the key event.
+        }
+
+      }
+      event.preventDefault();
+    }
   }
 
   run(args){
+    if(args){
+      if(args['disable_editing']){
+        this.disable_editing = args['disable_editing'];
+        this.disable_editing();
+      }
+      if(args['enable_editing']){
+        this.enable_editing = args['enable_editing'];
+      }
+    }
 
+    window.addEventListener("keydown", this, false);
+
+    this.running = true;
     this.runStack = this.runStack.concat(this.actions);
     this.changeScene(this.first_scene);
     this.loop();
   }
 
   stop(){
-    this.stopRunStack = true;
+    if (this.running){
+      this.running = false;
+    }
   }
 
   reset(){
-    this.stopRunStack = false;
     this.runStackPaused = false;
     this.runStack = [];
+    if (this.enable_editing){
+      this.enable_editing();
+    }
+    this.currentMessage = null;
+    this.currentScene = null;
+    removeEventListener("keydown",this,false);
   }
 
   loop(){
@@ -46,26 +121,27 @@ class Game extends GameContainer {
   }
 
   stackRunner(){
-    if (this.runStack.length > 0){
-      if(!this.runStackPaused){
-        var action = this.runStack.shift();
-        action.run();
+    if(!this.runStackPaused){
+      if (this.runStack.length > 0){
+        this.currentAction = this.runStack.shift();
+        this.currentAction.run();
+      }else{
+        this.stop();
       }
-    }else{
-      this.stop();
     }
-    if (this.stopRunStack){
+    this.updatePlayView();
+
+    if (this.running){
+      this.loop();
+    }else{
       console.log("Stopping!");
       this.reset();
-    }else{
-      this.loop();
     }
   }
 
   changeScene(scene_id){
     this.currentScene = this.scenes[scene_id];
     this.currentScene.run();
-    this.updatePlayView();
   }
 
   createPlayContext(){
@@ -82,6 +158,7 @@ class Game extends GameContainer {
     this.playContext = this.canvas.getContext("2d");
     this.playContext.scale(2,2);
     this.playContext.imageSmoothingEnabled = false;
+    this.playContext.font = this.textFont;
   }
 
   updatePlayView(){
@@ -93,6 +170,20 @@ class Game extends GameContainer {
         if (thing.spriteImage){
           this.playContext.drawImage(thing.spriteImage,thing.location[0],thing.location[1]);
         }
+      }
+      if (this.currentMessage){
+        var lineNum = 0;
+        this.playContext.fillStyle = "black";
+        this.playContext.fillRect(80, 0, this.messageBoxDimensions[0], this.messageBoxDimensions[1])
+        this.playContext.fillStyle = "white";
+        for(const line of this.currentMessage){
+          var y_coord = 10 + this.textFontSize*lineNum;
+          var x_coord = 85;
+          this.playContext.fillText(line,x_coord,y_coord);
+          lineNum += 1;
+        }
+        lineNum = 9;
+        this.playContext.fillText("Press S",235,5 + this.textFontSize*lineNum)
       }
     }else{
       this.playContext.clearRect(0,0,this.screenDimensions[0],this.screenDimensions[1]);
