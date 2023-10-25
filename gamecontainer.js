@@ -104,6 +104,7 @@ class GameContainer extends BuildingBlock{
   }
 
   run(args){
+    console.log(this.actions);
     this.game.runStack = this.game.runStack.concat(this.actions);
   }
 

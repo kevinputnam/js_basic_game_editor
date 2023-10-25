@@ -65,7 +65,7 @@
       "name": "Action_set_var",
       "actions": null,
       "variable": "default_timer",
-      "value": "500"
+      "value": "3000"
     }
   ],
   "author": "",
@@ -85,6 +85,22 @@
           "actions": null,
           "milliseconds": 0,
           "variable": "default_timer"
+        },
+        {
+          "name": "Action_message",
+          "actions": null,
+          "text_lines": [
+            "Did the timer actually work?"
+          ]
+        },
+        {
+          "name": "Action_change_scene",
+          "actions": null,
+          "scene_id": "1",
+          "player_pos": [
+            0,
+            0
+          ]
         }
       ],
       "id": 0,

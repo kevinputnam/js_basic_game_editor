@@ -1,7 +1,7 @@
 
 
 //register actions here, for add method.
-const action_types = ['Action_else','Action_if_eval','Action_message','Action_start_timer','Action_set_var'];
+const action_types = ['Action_else','Action_if_eval','Action_message','Action_start_timer','Action_set_var','Action_change_scene'];
 
 
 //prototype for all actions
@@ -222,6 +222,65 @@ class Action_set_var extends Action {
   }
 }
 
+class Action_change_scene extends Action {
+
+  constructor(data) {
+    super(data);
+
+    this.name = "Action_change_scene";
+    this.description = "Go to another scene.";
+
+    this.scene_id = 0;
+    this.player_pos = [0,0];
+  }
+
+  load(data){
+    super.load(data);
+    this.scene_id = data['scene_id'];
+    this.player_pos = data['player_pos'];
+  }
+
+  save(){
+    var data = super.save();
+    data['scene_id'] = this.scene_id;
+    data['player_pos'] = this.player_pos;
+    return data;
+  }
+
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = "<b>Change scene to </b> " + this.game.scenes[this.scene_id].name + "[" + this.scene_id + "]";
+  }
+
+  edit(node){
+    super.edit(node);
+    var me = this;
+    var editView = document.getElementById("editview");
+
+    var inputLabel = document.createElement("label")
+    inputLabel.innerHTML = "Change to scene: ";
+
+    var sceneSelector = document.createElement('select');
+    for (const [scene_id,scene] of Object.entries(this.game.scenes)){
+      var s = new Option;
+      s.value = scene_id;
+      s.innerHTML = scene.name + "[" + scene_id + "]";
+      sceneSelector.appendChild(s);
+      if (scene_id == this.scene_id){
+        s.setAttribute('selected','true');
+      }
+    }
+    sceneSelector.addEventListener("change", (event)=> {
+      me.scene_id = event.target.value;
+      me.updateNodes();
+    })
+    editView.append(inputLabel,sceneSelector);
+  }
+
+  run(){
+    this.game.changeScene(this.scene_id);
+  }
+}
+
 class Action_message extends Action {
 
   constructor(data) {
@@ -295,11 +354,19 @@ class Action_start_timer extends Action {
   }
 
   run(args){
+    var ms = this.milliseconds;
     if (this.variable.length > 0){
-      console.log("Starting timer for " + this.game.variables[this.variable] + "ms");
-    } else {
-      console.log("Starting timer for " + this.milliseconds + "ms");
+      ms = this.game.variables[this.variable];
     }
+    this.game.runStackPaused = true;
+    console.log("Starting timer for " + ms + "ms");
+    setTimeout(() => this.endTimer(),ms);
+  }
+
+  endTimer(){
+    this.game.runStackPaused = false;
+    console.log(this.name);
+    console.log("Timer completed.");
   }
 
   load(data){
@@ -406,10 +473,16 @@ class Action_if_eval extends Action {
   run(){
     if (eval(this.val1+this.operator+this.val2)){
         console.log("True!");
-        return true; //return all actions except else
+        this.game.runStack = this.game.runStack.concat(this.actions);
     } else {
         console.log("False!");
-        return false; //find child else action if there is one and return its actions
+        var else_actions = [];
+        for(const a of this.actions){
+          if (a.name == 'Action_else'){
+            else_actions = a.actions;
+          }
+        }
+        this.game.runStack = this.game.runStack.concat(else_actions);
     }
   }
 
@@ -435,7 +508,7 @@ class Action_if_eval extends Action {
       opt.value = i;
       opt.innerHTML = operator;
       if (operator == this.operator){
-        opt.setAttribute('seleted','true');
+        opt.setAttribute('selected','true');
       }
       operatorSelector.appendChild(opt);
       i += 1;

@@ -19,20 +19,54 @@ class Game extends GameContainer {
     this.createPlayContext();
     this.runStack = [];
     this.variables = {};
+    this.runStackPaused = false;
+    this.stackRunnerInterval = null;
+    this.stopRunStack = false;
   }
 
   run(args){
 
     this.runStack = this.runStack.concat(this.actions);
-    this.currentScene = this.scenes[this.first_scene];
-    this.currentScene.run();
-    this.updatePlayView();
-    while(this.runStack.length > 0){
-      var action = this.runStack.pop();
-      action.run();
+    this.changeScene(this.first_scene);
+    this.loop();
+  }
+
+  stop(){
+    this.stopRunStack = true;
+  }
+
+  reset(){
+    this.stopRunStack = false;
+    this.runStackPaused = false;
+    this.runStack = [];
+  }
+
+  loop(){
+    setTimeout(() => this.stackRunner(),25);
+  }
+
+  stackRunner(){
+    if (this.runStack.length > 0){
+      if(!this.runStackPaused){
+        var action = this.runStack.shift();
+        action.run();
+      }
+    }else{
+      this.stop();
+    }
+    if (this.stopRunStack){
+      console.log("Stopping!");
+      this.reset();
+    }else{
+      this.loop();
     }
   }
 
+  changeScene(scene_id){
+    this.currentScene = this.scenes[scene_id];
+    this.currentScene.run();
+    this.updatePlayView();
+  }
 
   createPlayContext(){
     var playView = document.getElementById('mapview');
