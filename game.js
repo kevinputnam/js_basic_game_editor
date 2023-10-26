@@ -30,20 +30,7 @@ class Game extends GameContainer {
     this.enable_editing = null;
     this.currentAction = null;
     this.controlKeys = ["ArrowDown","ArrowUp","ArrowLeft","ArrowRight","a","s"];
-    this.defaultButtonBindings = {'up':this,'down':this,'left':this,'right':this,'menu':this,'dismiss':this};
-    this.buttonBindings = this.defaultButtonBindings;
-  }
-
-  moveButton(direction){
-    console.log("move " + direction);
-  }
-
-  menuButton(){
-    console.log("open menu");
-  }
-
-  dismissButton(){
-    console.log("do nothing");
+    this.buttonEventHandler = "default";
   }
 
   handleEvent(event){
@@ -52,31 +39,76 @@ class Game extends GameContainer {
         return;
       }
       if(this.controlKeys.includes(event.key)){
-        switch (event.key) {
-          case "ArrowDown":
-            this.buttonBindings['down'].moveButton('down');
-            break;
-          case "ArrowUp":
-            this.buttonBindings['up'].moveButton('up');
-            break;
-          case "ArrowLeft":
-            this.buttonBindings['left'].moveButton('left');
-            break;
-          case "ArrowRight":
-            this.buttonBindings['right'].moveButton('right');
-            break;
-          case "a":
-            this.buttonBindings['menu'].menuButton();
-            break;
-          case "s":
-            this.buttonBindings['dismiss'].dismissButton();
-            break;
-          default:
-            return; // Quit when this doesn't handle the key event.
+        switch(this.buttonEventHandler){
+        case "message":
+          this.messageButtonHandler(event.key);
+          break;
+        case "menu":
+          this.menuButtonHandler(event.key);
+          break;
+        default:
+          this.defaulButtonHandler(event.key);
         }
-
       }
       event.preventDefault();
+    }
+  }
+
+  defaulButtonHandler(key){
+    switch (key) {
+      case "ArrowDown":
+        console.log('go down.');
+        break;
+      case "ArrowUp":
+        console.log('go up.');
+        break;
+      case "ArrowLeft":
+        console.log('go left.');
+        break;
+      case "ArrowRight":
+        console.log('go right.');
+        break;
+      case "a":
+        console.log('select');
+        break;
+      case "s":
+        console.log('dismiss');
+        break;
+      default:
+        return; // Quit when this doesn't handle the key event.
+    }
+  }
+
+  messageButtonHandler(key){
+    if (key == 's'){
+      this.dismissMessage();
+    }
+  }
+
+  menuButtonHandler(key){
+    switch (key) {
+      case "ArrowDown":
+        if(this.menuSelectorIndex < this.menuChoices.length -1){
+          this.menuSelectorIndex += 1;
+        }
+        break;
+      case "ArrowUp":
+        if(this.menuSelectorIndex > 0){
+          this.menuSelectorIndex -= 1;
+        }
+        break;
+      case "a":
+        console.log("$" + this.menuVariable + " set to " + this.menuSelectorIndex);
+        this.variables[this.menuVariable] = this.menuSelectorIndex;
+        this.dismissMenu();
+        break;
+      case "s":
+        console.log('dismiss');
+        this.variables[this.menuVariable] = null;
+        this.dismissMenu();
+        break;
+      default:
+        return; // Quit when this doesn't handle the key event.
     }
   }
 
@@ -139,6 +171,16 @@ class Game extends GameContainer {
     }
   }
 
+  runStackClear(){
+    this.runStack = [];
+  }
+
+  runStackInsert(actions){
+    var actionsCopy = actions.concat();
+    this.runStack.unshift(...actionsCopy);
+  }
+
+
   changeScene(scene_id){
     this.currentScene = this.scenes[scene_id];
     this.currentScene.run();
@@ -171,23 +213,91 @@ class Game extends GameContainer {
           this.playContext.drawImage(thing.spriteImage,thing.location[0],thing.location[1]);
         }
       }
-      if (this.currentMessage){
-        var lineNum = 0;
-        this.playContext.fillStyle = "black";
-        this.playContext.fillRect(80, 0, this.messageBoxDimensions[0], this.messageBoxDimensions[1])
-        this.playContext.fillStyle = "white";
-        for(const line of this.currentMessage){
-          var y_coord = 10 + this.textFontSize*lineNum;
-          var x_coord = 85;
-          this.playContext.fillText(line,x_coord,y_coord);
-          lineNum += 1;
-        }
-        lineNum = 9;
-        this.playContext.fillText("Press S",235,5 + this.textFontSize*lineNum)
-      }
+      this.drawMessage();
+      this.drawMenu();
     }else{
       this.playContext.clearRect(0,0,this.screenDimensions[0],this.screenDimensions[1]);
     }
+  }
+
+  drawMessage(){
+    if (this.currentMessage){
+      var lineNum = 0;
+      //draw rectangle
+      this.playContext.fillStyle = "black";
+      this.playContext.fillRect(80, 0, this.messageBoxDimensions[0], this.messageBoxDimensions[1])
+      //draw text
+      this.playContext.fillStyle = "white";
+      for(const line of this.currentMessage){
+        var y_coord = 10 + this.textFontSize*lineNum;
+        var x_coord = 85;
+        this.playContext.fillText(line,x_coord,y_coord);
+        lineNum += 1;
+      }
+      lineNum = 9;
+      this.playContext.fillText("B: Dismiss",215,5 + this.textFontSize*lineNum)
+    }
+  }
+
+  drawMenu(){
+    if (this.menuChoices){
+      var lineNum = 0;
+      var cursor = '>';
+      var lines = this.menuPrompt.concat(); // make a copy
+      var choiceIndex = 0;
+      for(var line of this.menuChoices){
+        if(choiceIndex == this.menuSelectorIndex){
+          line = cursor + line;
+        }else{
+          line = ' ' + line;
+        }
+        choiceIndex += 1;
+        lines.push(line);
+      }
+      //draw rectangle
+      this.playContext.fillStyle = "black";
+      this.playContext.fillRect(80, 0, this.messageBoxDimensions[0], this.messageBoxDimensions[1])
+      //draw text
+      this.playContext.fillStyle = "white";
+      for(const line of lines){
+        var y_coord = 10 + this.textFontSize*lineNum;
+        var x_coord = 85;
+        this.playContext.fillText(line,x_coord,y_coord);
+        lineNum += 1;
+      }
+      lineNum = 9;
+      this.playContext.fillText("A: Select B: Dismiss", 155, 5 + this.textFontSize*lineNum)
+    }
+  }
+
+  displayMessage(text_lines){
+    this.currentMessage = text_lines;
+    this.buttonEventHandler = 'message';
+    this.runStackPaused = true;
+  }
+
+  dismissMessage(){
+    this.runStackPaused = false;
+    this.currentMessage = null;
+    this.buttonEventHandler = 'default';
+  }
+
+  displayMenu(choices,prompt,result_variable){
+    this.menuChoices = choices;
+    this.menuPrompt = prompt;
+    this.menuSelectorIndex = 0;
+    this.menuVariable = result_variable;
+    this.buttonEventHandler = 'menu';
+    this.runStackPaused = true;
+  }
+
+  dismissMenu(){
+    this.runStackPaused = false;
+    this.menuChoices = null;
+    this.menuPrompt = null;
+    this.menuSelectorIndex = 0;
+    this.menuVariable = null;
+    this.buttonEventHandler = 'default';
   }
 
   updateDisplay(nodeSpan){

@@ -1,7 +1,7 @@
 
 
 //register actions here, for add method.
-const action_types = ['Action_else','Action_if_eval','Action_message','Action_start_timer','Action_set_var','Action_change_scene'];
+const action_types = ['Action_else','Action_loop','Action_if_eval','Action_menu','Action_message','Action_start_timer','Action_set_var','Action_change_scene'];
 
 
 //prototype for all actions
@@ -40,11 +40,24 @@ class Action extends BuildingBlock{
 
   getChildContainer(parent,name){
     for (const node of parent.childNodes){
-      console.log(node);
       if (node.classList.contains(name)){
         return node;
       }
     }
+  }
+
+  replaceVariables(text){
+    var bits = text.split('`');
+    var returnString = '';
+    for (var bit of bits){
+      var newbit = bit;
+      if(bit.startsWith('$')){
+        var varName = bit.replace('$','');
+        newbit = this.game.variables[varName];
+      }
+      returnString += newbit;
+    }
+    return returnString;
   }
 
   display() {
@@ -174,7 +187,6 @@ class Action_set_var extends Action {
 
   run(args){
     this.game.variables[this.variable] = this.value;
-    console.log("Setting " + this.variable + " to " + this.value);
   }
 
   load(data){
@@ -281,6 +293,94 @@ class Action_change_scene extends Action {
   }
 }
 
+class Action_menu extends Action {
+
+  constructor(data) {
+    super(data);
+
+    this.name = "Action_menu";
+    this.description = "Display a modal menu and save the selection value to a variable.";
+
+    this.prompt = [];
+    this.choices = [];
+    this.variable = null;
+  }
+
+  run(args){
+    this.game.displayMenu(this.choices,this.prompt,this.variable);
+  }
+
+  load(data){
+    super.load(data);
+    this.choices = data['choices'];
+    this.prompt = data['prompt'];
+    this.variable = data['variable'];
+  }
+
+  save(){
+    var data = super.save();
+    data['choices'] = this.choices;
+    data['prompt'] = this.prompt;
+    data['variable'] = this.variable;
+    return data;
+  }
+
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = '<b>Menu</b> choice <b>returns</b> $' + this.variable;
+  }
+
+  edit(node){
+    super.edit(node);
+    var me = this;
+    var editView = document.getElementById("editview");
+
+    var inputLabel = document.createElement('label');
+    inputLabel.innerHTML = "Result varaible: ";
+
+    var variableInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    variableInputField.value = this.variable;
+    variableInputField.addEventListener("change", (event)=> {
+      me.variable = event.target.value;
+      me.updateNodes();
+    })
+
+    editView.append(inputLabel,variableInputField,document.createElement('br'));
+
+    var inputLabel1 = document.createElement("label");
+    inputLabel1.innerHTML = "Menu prompt: ";
+
+    var promptText = '';
+    for (const line of this.prompt){
+      promptText += line + "\n";
+    }
+
+    var promptInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    promptInputField.value = promptText;
+    promptInputField.addEventListener("change", (event)=> {
+      me.prompt = event.target.value.split('\n');
+    })
+
+    editView.append(inputLabel1,promptInputField,document.createElement('br'));
+
+    var inputLabel2 = document.createElement("label");
+    inputLabel2.innerHTML = "Menu choices: ";
+
+    var menuInputField = createElementWithAttributes('textarea',{'rows':'8','cols':'30'});
+
+    var text = '';
+    for (const line of this.choices){
+      text += line + "\n";
+    }
+
+    menuInputField.value = text;
+    menuInputField.addEventListener("change", (event)=> {
+      me.choices = event.target.value.split('\n');
+    })
+
+    editView.append(inputLabel2,document.createElement("br"),menuInputField);
+  }
+}
+
 class Action_message extends Action {
 
   constructor(data) {
@@ -293,15 +393,7 @@ class Action_message extends Action {
   }
 
   run(args){
-    this.game.currentMessage = this.text_lines;
-    this.game.buttonBindings['dismiss'] = this;
-    this.game.runStackPaused = true;
-  }
-
-  dismissButton(args){
-    this.game.runStackPaused = false;
-    this.game.currentMessage = null;
-    this.game.buttonBindings = this.game.defaultButtonBindings;
+    this.game.displayMessage(this.text_lines);
   }
 
   load(data){
@@ -371,14 +463,11 @@ class Action_start_timer extends Action {
       ms = this.game.variables[this.variable];
     }
     this.game.runStackPaused = true;
-    console.log("Starting timer for " + ms + "ms");
     setTimeout(() => this.endTimer(),ms);
   }
 
   endTimer(){
     this.game.runStackPaused = false;
-    console.log(this.name);
-    console.log("Timer completed.");
   }
 
   load(data){
@@ -467,7 +556,7 @@ class Action_if_eval extends Action {
     super.load(data);
     this.val1 = data['val1'];
     this.val2 = data['val2'];
-    this.val3 = data['val3'];
+    this.operator = data['operator'];
   }
 
   save(){
@@ -483,18 +572,16 @@ class Action_if_eval extends Action {
   }
 
   run(){
-    if (eval(this.val1+this.operator+this.val2)){
-        console.log("True!");
-        this.game.runStack = this.game.runStack.concat(this.actions);
+    if (eval(this.replaceVariables(this.val1)+this.operator+this.replaceVariables(this.val2))){
+        this.game.runStackInsert(this.actions);
     } else {
-        console.log("False!");
         var else_actions = [];
         for(const a of this.actions){
           if (a.name == 'Action_else'){
             else_actions = a.actions;
           }
         }
-        this.game.runStack = this.game.runStack.concat(else_actions);
+        this.game.runStackInsert(else_actions);
     }
   }
 
@@ -541,5 +628,33 @@ class Action_if_eval extends Action {
     })
 
     editView.append(inputLabel1,val1InputField,operatorSelector,inputLabel2,val2InputField);
+  }
+}
+
+class Action_loop extends Action_if_eval {
+
+  constructor(data){
+    super(data);
+
+    this.name = "Action_loop";
+    this.description = "Continue to run the actions until exit condition met."
+  }
+
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = '<b>Do While </b>' + this.val1 + " <b>" + this.operator + "</b> " + this.val2;
+  }
+
+  run(){
+    if (eval(this.replaceVariables(this.val1)+this.operator+this.replaceVariables(this.val2))){
+      console.log("True!");
+      var nextLoop = new Action_loop({'parent':this,'game':this.game});
+      nextLoop.actions = nextLoop.actions.concat(this.actions);
+      nextLoop.val1 = this.val1;
+      nextLoop.val2 = this.val2;
+      nextLoop.operator = this.operator;
+      this.game.runStackInsert([nextLoop]);
+      this.game.runStackInsert(this.actions);
+      //add itself until condition not met.
+    }
   }
 }

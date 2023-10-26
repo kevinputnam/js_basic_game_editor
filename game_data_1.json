@@ -65,7 +65,7 @@
       "name": "Action_set_var",
       "actions": null,
       "variable": "default_timer",
-      "value": "3000"
+      "value": "500"
     }
   ],
   "author": "",
@@ -187,6 +187,57 @@
             "make friends, and eventually",
             "deal with those pesky pirates."
           ]
+        },
+        {
+          "name": "Action_set_var",
+          "actions": null,
+          "variable": "looping",
+          "value": "1"
+        },
+        {
+          "name": "Action_loop",
+          "actions": [
+            {
+              "name": "Action_menu",
+              "actions": null,
+              "choices": [
+                "1. Check out the rock",
+                "2. Look at the little blue card",
+                "3. Wander around",
+                "4. Talk to the vagrant"
+              ],
+              "prompt": [
+                "What do you want to do?"
+              ],
+              "variable": "menu_selection"
+            },
+            {
+              "name": "Action_if_eval",
+              "actions": [
+                {
+                  "name": "Action_set_var",
+                  "actions": null,
+                  "variable": "looping",
+                  "value": "0"
+                },
+                {
+                  "name": "Action_message",
+                  "actions": null,
+                  "text_lines": [
+                    "So, you've decided to end the",
+                    "game.",
+                    ""
+                  ]
+                }
+              ],
+              "val1": "`$menu_selection`",
+              "val2": "3",
+              "operator": "=="
+            }
+          ],
+          "val1": "`$looping`",
+          "val2": "1",
+          "operator": "=="
         }
       ],
       "id": 3,

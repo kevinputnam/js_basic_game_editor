@@ -16,6 +16,11 @@ class Scene extends GameContainer {
     this.collisions = [];
   }
 
+  run(){
+    this.game.runStackClear();
+    this.game.runStack.concat(this.currentScene.actions);
+  }
+
   load(data) {
     super.load(data);
 
