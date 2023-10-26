@@ -31,6 +31,7 @@ class Game extends GameContainer {
     this.currentAction = null;
     this.controlKeys = ["ArrowDown","ArrowUp","ArrowLeft","ArrowRight","a","s"];
     this.buttonEventHandler = "default";
+    this.testPlayer = null;
   }
 
   handleEvent(event){
@@ -57,16 +58,20 @@ class Game extends GameContainer {
   defaulButtonHandler(key){
     switch (key) {
       case "ArrowDown":
-        console.log('go down.');
+        console.log('go down.' + this.testPlayer.location);
+        this.testPlayer.location[1] = parseInt(this.testPlayer.location[1]) + 1;
         break;
       case "ArrowUp":
-        console.log('go up.');
+        console.log('go up.' + this.testPlayer.location);
+        this.testPlayer.location[1] = parseInt(this.testPlayer.location[1]) - 1;
         break;
       case "ArrowLeft":
-        console.log('go left.');
+        console.log('go left.' + this.testPlayer.location);
+        this.testPlayer.location[0] = parseInt(this.testPlayer.location[0]) - 1;
         break;
       case "ArrowRight":
-        console.log('go right.');
+        this.testPlayer.location[0] = parseInt(this.testPlayer.location[0]) + 1;
+        console.log('go right.' + this.testPlayer.location);
         break;
       case "a":
         console.log('select');
@@ -123,6 +128,8 @@ class Game extends GameContainer {
       }
     }
 
+    this.testPlayer = this.things[2];
+
     window.addEventListener("keydown", this, false);
 
     this.running = true;
@@ -156,9 +163,9 @@ class Game extends GameContainer {
       if (this.runStack.length > 0){
         this.currentAction = this.runStack.shift();
         this.currentAction.run();
-      }else{
-        this.stop();
-      }
+      }//else{
+       // this.stop();
+      //}
     }
     this.updatePlayView();
 

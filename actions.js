@@ -1,7 +1,7 @@
 
 
 //register actions here, for add method.
-const action_types = ['Action_else','Action_loop','Action_if_eval','Action_menu','Action_message','Action_start_timer','Action_set_var','Action_change_scene'];
+const action_types = ['Action_else','Action_loop','Action_if_eval','Action_menu','Action_message','Action_start_timer','Action_set_var','Action_change_scene','Action_move_thing'];
 
 
 //prototype for all actions
@@ -231,6 +231,81 @@ class Action_set_var extends Action {
     })
 
     editView.append(inputLabel,variableInputField,inputLabel2,valueInputField);
+  }
+}
+
+class Action_move_thing extends Action {
+
+  constructor(data) {
+    super(data);
+
+    this.name = "Action_move_thing";
+    this.description = "Move thing to an x,y location."
+
+    this.thing_id = 0;
+    this.location = [0,0];
+  }
+
+  load(data){
+    super.load(data);
+    this.thing_id = data['thing_id'];
+    this.location = data['location'];
+  }
+
+  save(data){
+    var data = super.save();
+    data['thing_id'] = this.thing_id;
+    data['location'] = this.location;
+    return data;
+  }
+
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = "<b>Move</b> " + this.game.things[this.thing_id].name + " to [" + this.location[0] + "," + this.location[1] + "]";
+  }
+
+  edit(node){
+    super.edit(node);
+    var me = this;
+    var editView = document.getElementById("editview");
+
+    var inputLabel = document.createElement("label")
+    inputLabel.innerHTML = "Thing to move: ";
+
+    var thingSelector = document.createElement('select');
+    for (const [thing_id,thing] of Object.entries(this.game.things)){
+      var s = new Option;
+      s.value = thing_id;
+      s.innerHTML = thing.name + "[" + thing_id + "]";
+      thingSelector.appendChild(s);
+    }
+    thingSelector.addEventListener("change", (event)=> {
+      me.thing_id = event.target.value;
+      me.updateNodes();
+    })
+    editView.append(inputLabel,thingSelector,document.createElement('br'));
+
+    var inputLabel2 = document.createElement("label")
+    inputLabel2.innerHTML = "Location [x,y]: ";
+
+    var xInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':this.game.screenDimensions[0]});
+    xInputField.value = this.location[0];
+    xInputField.addEventListener("change", (event)=> {
+      me.location[0] = event.target.value;
+      me.game.updatePlayView();
+    });
+
+    var yInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':this.game.screenDimensions[1]});
+    yInputField.value = this.location[1];
+    yInputField.addEventListener("change", (event)=> {
+      me.location[1] = event.target.value;
+      me.game.updatePlayView();
+    });
+
+    editView.append(inputLabel2,xInputField,yInputField);
+  }
+
+  run(){
+    this.game.things[this.thing_id].location = this.location;
   }
 }
 

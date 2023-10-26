@@ -205,10 +205,11 @@
               "name": "Action_menu",
               "actions": null,
               "choices": [
-                "1. Check out the rock",
+                "1. Move the rock",
                 "2. Look at the little blue card",
                 "3. Wander around",
-                "4. Talk to the vagrant"
+                "4. Talk to the vagrant",
+                ""
               ],
               "prompt": [
                 "What do you want to do?"
@@ -236,6 +237,23 @@
               ],
               "val1": "`$menu_selection`",
               "val2": "3",
+              "operator": "=="
+            },
+            {
+              "name": "Action_if_eval",
+              "actions": [
+                {
+                  "name": "Action_move_thing",
+                  "actions": null,
+                  "thing_id": 0,
+                  "location": [
+                    "200",
+                    "130"
+                  ]
+                }
+              ],
+              "val1": "`$menu_selection`",
+              "val2": "0",
               "operator": "=="
             }
           ],
