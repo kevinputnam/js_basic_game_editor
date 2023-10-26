@@ -285,7 +285,26 @@ class Action_change_scene extends Action {
       me.scene_id = event.target.value;
       me.updateNodes();
     })
-    editView.append(inputLabel,sceneSelector);
+    editView.append(inputLabel,sceneSelector,document.createElement('br'));
+
+    var inputLabel2 = document.createElement("label")
+    inputLabel2.innerHTML = "Player position [x,y]: ";
+
+    var xInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':this.game.screenDimensions[0]});
+    xInputField.value = this.player_pos[0];
+    xInputField.addEventListener("change", (event)=> {
+      me.player_pos[0] = event.target.value;
+      me.game.updatePlayView();
+    })
+
+    var yInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':this.game.screenDimensions[1]});
+    yInputField.value = this.player_pos[1];
+    yInputField.addEventListener("change", (event)=> {
+      me.player_pos[1] = event.target.value;
+      me.game.updatePlayView();
+    })
+
+    editView.append(inputLabel2,xInputField,yInputField);
   }
 
   run(){
@@ -652,9 +671,8 @@ class Action_loop extends Action_if_eval {
       nextLoop.val1 = this.val1;
       nextLoop.val2 = this.val2;
       nextLoop.operator = this.operator;
-      this.game.runStackInsert([nextLoop]);
+      this.game.runStackInsert([nextLoop]);//add self until condition not met
       this.game.runStackInsert(this.actions);
-      //add itself until condition not met.
     }
   }
 }

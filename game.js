@@ -127,7 +127,6 @@ class Game extends GameContainer {
 
     this.running = true;
     this.runStack = this.runStack.concat(this.actions);
-    this.changeScene(this.first_scene);
     this.loop();
   }
 
@@ -340,8 +339,6 @@ class Game extends GameContainer {
     super.load(data);
 
     this.author= data['author'];
-    this.first_scene = data['first_scene'];
-    this.start_player_pos = data['start_player_pos'];
 
     var childData = {'parent':null,'game':this.game};
 
@@ -365,8 +362,6 @@ class Game extends GameContainer {
   save() {
     var data = super.save();
     data['author'] = this.author;
-    data['first_scene'] = this.first_scene;
-    data['start_player_pos'] = this.start_player_pos;
 
     var things = {}
     for (const [key,value] of Object.entries(this.things)){
@@ -395,31 +390,5 @@ class Game extends GameContainer {
     var thingNodes = this.getChildContainer(this.nodes[0],'things');
     thingNodes.append(thing.display('game'));
     this.edit(this.currentNode);
-  }
-
-  edit(node){
-    super.edit(node);
-    var me = this;
-    var editView = document.getElementById('editview');
-
-    var sceneLabel = document.createElement('label');
-    sceneLabel.innerHTML = '<b>First scene: <b>';
-
-    var startSceneSelector = document.createElement('select');
-    for (const [s_id,s] of Object.entries(this.scenes)){
-    var opt = new Option;
-    opt.value = s_id;
-    opt.innerHTML = s.name + '['+s.id+']';
-    startSceneSelector.appendChild(opt);
-    startSceneSelector.addEventListener(
-        "change",
-        function () {
-          me.first_scene = startSceneSelector.value;
-        },
-        false,
-      );
-    }
-    startSceneSelector.value = this.first_scene;
-    editView.append(sceneLabel,startSceneSelector);
   }
 }

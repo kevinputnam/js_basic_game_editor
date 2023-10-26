@@ -17,8 +17,7 @@ class Scene extends GameContainer {
   }
 
   run(){
-    this.game.runStackClear();
-    this.game.runStack.concat(this.currentScene.actions);
+    this.game.runStackInsert(this.actions);
   }
 
   load(data) {

@@ -66,14 +66,18 @@
       "actions": null,
       "variable": "default_timer",
       "value": "500"
+    },
+    {
+      "name": "Action_change_scene",
+      "actions": null,
+      "scene_id": 0,
+      "player_pos": [
+        0,
+        0
+      ]
     }
   ],
   "author": "",
-  "first_scene": "0",
-  "start_player_pos": [
-    0,
-    0
-  ],
   "scenes": {
     "0": {
       "name": "Logo",
