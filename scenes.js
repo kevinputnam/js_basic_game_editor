@@ -11,6 +11,7 @@ class Scene extends GameContainer {
 
     this.background = "";
     this.backgroundImage = null;
+    this.draw_player = false;
     this.map_size = [];
     this.grid_size = null;
     this.collisions = [];
@@ -37,6 +38,7 @@ class Scene extends GameContainer {
         me.game.updatePlayView();
       });
     }
+    this.draw_player = data['draw_player'];
     this.map_size = data['map_size'];
     this.grid_size = data['grid_size'];
     this.collisions = data['collisions'];
@@ -46,6 +48,7 @@ class Scene extends GameContainer {
     var data = super.save();
     data['id'] = this.id;
     data['background'] = this.background;
+    data['draw_player'] = this.draw_player;
     data['map_size'] = this.map_size;
     data['grid_size'] = this.grid_size;
     data['collisions'] = this.collisions;
@@ -60,6 +63,18 @@ class Scene extends GameContainer {
     var editView = document.getElementById('editview');
 
     this.game.updatePlayView();
+
+    var drawPlayerCheckbox = createElementWithAttributes('input',{'type':'checkbox'});
+    drawPlayerCheckbox.checked = this.draw_player;
+    drawPlayerCheckbox.addEventListener("change", (event)=>{
+      me.draw_player = event.target.checked;
+      me.game.updatePlayView();
+    })
+
+    var playerLabel = document.createElement("label");
+    playerLabel.innerHTML = "Draw player";
+
+    editView.append(drawPlayerCheckbox,playerLabel,document.createElement('br'));
 
     var inputLabel = document.createElement("label")
     inputLabel.innerHTML = "Background image: ";

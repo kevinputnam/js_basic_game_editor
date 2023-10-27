@@ -31,7 +31,7 @@ class Game extends GameContainer {
     this.currentAction = null;
     this.controlKeys = ["ArrowDown","ArrowUp","ArrowLeft","ArrowRight","a","s"];
     this.buttonEventHandler = "default";
-    this.testPlayer = null;
+    this.player = null;
   }
 
   handleEvent(event){
@@ -58,20 +58,20 @@ class Game extends GameContainer {
   defaulButtonHandler(key){
     switch (key) {
       case "ArrowDown":
-        console.log('go down.' + this.testPlayer.location);
-        this.testPlayer.location[1] = parseInt(this.testPlayer.location[1]) + 1;
+        console.log('go down.' + this.player.location);
+        this.player.location[1] = parseInt(this.player.location[1]) + 2;
         break;
       case "ArrowUp":
-        console.log('go up.' + this.testPlayer.location);
-        this.testPlayer.location[1] = parseInt(this.testPlayer.location[1]) - 1;
+        console.log('go up.' + this.player.location);
+        this.player.location[1] = parseInt(this.player.location[1]) - 2;
         break;
       case "ArrowLeft":
-        console.log('go left.' + this.testPlayer.location);
-        this.testPlayer.location[0] = parseInt(this.testPlayer.location[0]) - 1;
+        console.log('go left.' + this.player.location);
+        this.player.location[0] = parseInt(this.player.location[0]) - 2;
         break;
       case "ArrowRight":
-        this.testPlayer.location[0] = parseInt(this.testPlayer.location[0]) + 1;
-        console.log('go right.' + this.testPlayer.location);
+        this.player.location[0] = parseInt(this.player.location[0]) + 2;
+        console.log('go right.' + this.player.location);
         break;
       case "a":
         console.log('select');
@@ -85,7 +85,7 @@ class Game extends GameContainer {
   }
 
   messageButtonHandler(key){
-    if (key == 's'){
+    if (key == 's' || key == 'a'){
       this.dismissMessage();
     }
   }
@@ -105,6 +105,9 @@ class Game extends GameContainer {
       case "a":
         console.log("$" + this.menuVariable + " set to " + this.menuSelectorIndex);
         this.variables[this.menuVariable] = this.menuSelectorIndex;
+        if (this.menuUseValue){
+          this.variables[this.menuVariable] = this.menuChoices[this.menuSelectorIndex];
+        }
         this.dismissMenu();
         break;
       case "s":
@@ -128,8 +131,6 @@ class Game extends GameContainer {
       }
     }
 
-    this.testPlayer = this.things[2];
-
     window.addEventListener("keydown", this, false);
 
     this.running = true;
@@ -146,6 +147,7 @@ class Game extends GameContainer {
   reset(){
     this.runStackPaused = false;
     this.runStack = [];
+    this.variables = {};
     if (this.enable_editing){
       this.enable_editing();
     }
@@ -188,6 +190,7 @@ class Game extends GameContainer {
 
 
   changeScene(scene_id){
+    this.runStackClear();
     this.currentScene = this.scenes[scene_id];
     this.currentScene.run();
   }
@@ -218,6 +221,9 @@ class Game extends GameContainer {
         if (thing.spriteImage){
           this.playContext.drawImage(thing.spriteImage,thing.location[0],thing.location[1]);
         }
+      }
+      if(this.currentScene.draw_player){
+        this.playContext.drawImage(this.player.spriteImage,this.player.location[0],this.player.location[1]);
       }
       this.drawMessage();
       this.drawMenu();
@@ -288,11 +294,12 @@ class Game extends GameContainer {
     this.buttonEventHandler = 'default';
   }
 
-  displayMenu(choices,prompt,result_variable){
+  displayMenu(choices,prompt,result_variable,useValue){
     this.menuChoices = choices;
     this.menuPrompt = prompt;
     this.menuSelectorIndex = 0;
     this.menuVariable = result_variable;
+    this.menuUseValue = useValue;
     this.buttonEventHandler = 'menu';
     this.runStackPaused = true;
   }
@@ -303,6 +310,7 @@ class Game extends GameContainer {
     this.menuPrompt = null;
     this.menuSelectorIndex = 0;
     this.menuVariable = null;
+    this.menuUseValue = false;
     this.buttonEventHandler = 'default';
   }
 
@@ -319,6 +327,23 @@ class Game extends GameContainer {
         var thingNode = thing.display('game');
         thingNodes.append(thingNode);
       }
+    }
+
+    var player_sp = document.createElement('span')
+    var player_tv = document.createElement('div');
+    player_sp.setAttribute('class','caret');
+    player_sp.setAttribute('onclick','flipCaret(this)');
+    player_sp.innerHTML = 'Player';
+    player_tv.append(player_sp);
+
+    var playerNodes = document.createElement('div');
+    playerNodes.setAttribute('class','nested player');
+    player_tv.append(playerNodes);
+    node.append(player_tv);
+
+    if (this.player){
+      var playerNode = this.player.display('game');
+      playerNodes.append(playerNode);
     }
 
     var scene_sp = document.createElement('span')
@@ -338,6 +363,7 @@ class Game extends GameContainer {
         sceneNodes.append(sceneNode);
       }
     }
+
     return node;
   }
 
@@ -354,6 +380,11 @@ class Game extends GameContainer {
       var newThing = new Thing(childData);
       newThing.load(thing_data);
       this.things[newThing.id] = newThing;
+    }
+
+    this.player = new Player(childData);
+    if (data['player']){
+      this.player.load(data['player']);
     }
 
     childData['parent'] = this;
@@ -375,6 +406,8 @@ class Game extends GameContainer {
       things[key] = value.save();
     }
     data['things'] = things;
+
+    data['player'] = this.player.save();
 
     var scenes = {}
     for (const [key,value] of Object.entries(this.scenes)){

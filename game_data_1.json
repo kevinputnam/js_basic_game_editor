@@ -12,12 +12,12 @@
       "trigger": false,
       "triggered": false,
       "location": [
-        "130",
+        "92",
         "130"
       ],
       "dimensions": [
-        0,
-        0
+        "16",
+        "16"
       ],
       "spritePath": "/assets/sprites/rock.png"
     },
@@ -35,8 +35,8 @@
         "200"
       ],
       "dimensions": [
-        0,
-        0
+        "16",
+        "16"
       ],
       "spritePath": "assets/sprites/access_card.png"
     },
@@ -50,12 +50,12 @@
       "trigger": false,
       "triggered": false,
       "location": [
-        "40",
-        "40"
+        42,
+        46
       ],
       "dimensions": [
-        0,
-        0
+        "16",
+        "16"
       ],
       "spritePath": "assets/sprites/dog.png"
     }
@@ -68,6 +68,12 @@
       "value": "500"
     },
     {
+      "name": "Action_set_var",
+      "actions": null,
+      "variable": "banana",
+      "value": "\"purple\""
+    },
+    {
       "name": "Action_change_scene",
       "actions": null,
       "scene_id": 0,
@@ -78,6 +84,24 @@
     }
   ],
   "author": "",
+  "player": {
+    "name": "Jamie Grear",
+    "description": "A fighter and survivor.",
+    "things": [],
+    "actions": [],
+    "hidden": false,
+    "trigger": false,
+    "triggered": false,
+    "location": [
+      0,
+      0
+    ],
+    "dimensions": [
+      "16",
+      "16"
+    ],
+    "spritePath": "assets/sprites/jamie.png"
+  },
   "scenes": {
     "0": {
       "name": "Logo",
@@ -89,6 +113,31 @@
           "actions": null,
           "milliseconds": 0,
           "variable": "default_timer"
+        },
+        {
+          "name": "Action_set_var",
+          "actions": null,
+          "variable": "value1",
+          "value": "3"
+        },
+        {
+          "name": "Action_set_var",
+          "actions": null,
+          "variable": "value2",
+          "value": "4"
+        },
+        {
+          "name": "Action_set_var",
+          "actions": null,
+          "variable": "math_test",
+          "value": "`$value1` + `$value2`"
+        },
+        {
+          "name": "Action_message",
+          "actions": null,
+          "text_lines": [
+            "Math test: `$math_test`"
+          ]
         },
         {
           "name": "Action_change_scene",
@@ -118,6 +167,22 @@
           "variable": "default_timer"
         },
         {
+          "name": "Action_menu",
+          "actions": null,
+          "choices": [
+            "blue",
+            "yellow",
+            "green",
+            "brown",
+            "`$banana`"
+          ],
+          "prompt": [
+            "What color is your banana"
+          ],
+          "variable": "banana",
+          "useValue": true
+        },
+        {
           "name": "Action_change_scene",
           "actions": null,
           "scene_id": "2",
@@ -145,12 +210,70 @@
           "variable": "default_timer"
         },
         {
+          "name": "Action_switch",
+          "actions": [
+            {
+              "name": "Action_case",
+              "actions": [
+                {
+                  "name": "Action_message",
+                  "actions": null,
+                  "text_lines": [
+                    "Time to eat it!"
+                  ]
+                }
+              ],
+              "value": "\"yellow\""
+            },
+            {
+              "name": "Action_case",
+              "actions": [
+                {
+                  "name": "Action_message",
+                  "actions": null,
+                  "text_lines": [
+                    "Need to wait a bit before eating",
+                    "it.",
+                    ""
+                  ]
+                }
+              ],
+              "value": "\"green\""
+            },
+            {
+              "name": "Action_case",
+              "actions": [
+                {
+                  "name": "Action_message",
+                  "actions": null,
+                  "text_lines": [
+                    "You waited too long. Time for",
+                    "banana bread.",
+                    ""
+                  ]
+                }
+              ],
+              "value": "\"brown\""
+            },
+            {
+              "name": "Action_message",
+              "actions": null,
+              "text_lines": [
+                "Who ever heard of a `$banana`",
+                "banana?",
+                ""
+              ]
+            }
+          ],
+          "variable": "banana"
+        },
+        {
           "name": "Action_change_scene",
           "actions": null,
           "scene_id": "3",
           "player_pos": [
-            0,
-            0
+            "30",
+            "30"
           ]
         }
       ],
@@ -214,7 +337,8 @@
               "prompt": [
                 "What do you want to do?"
               ],
-              "variable": "menu_selection"
+              "variable": "menu_selection",
+              "useValue": false
             },
             {
               "name": "Action_if_eval",
@@ -247,7 +371,7 @@
                   "actions": null,
                   "thing_id": 0,
                   "location": [
-                    "200",
+                    "92",
                     "130"
                   ]
                 }
@@ -264,6 +388,7 @@
       ],
       "id": 3,
       "background": "assets/backgrounds/campus.png",
+      "draw_player": true,
       "map_size": [],
       "grid_size": null,
       "collisions": []

@@ -1,7 +1,7 @@
 
 
 //register actions here, for add method.
-const action_types = ['Action_else','Action_loop','Action_if_eval','Action_menu','Action_message','Action_start_timer','Action_set_var','Action_change_scene','Action_move_thing'];
+const action_types = ['Action_else','Action_loop','Action_if_eval','Action_menu','Action_message','Action_start_timer','Action_set_var','Action_change_scene','Action_move_thing','Action_switch','Action_case'];
 
 
 //prototype for all actions
@@ -186,7 +186,7 @@ class Action_set_var extends Action {
   }
 
   run(args){
-    this.game.variables[this.variable] = this.value;
+    this.game.variables[this.variable] = eval(this.replaceVariables(this.value));
   }
 
   load(data){
@@ -384,6 +384,7 @@ class Action_change_scene extends Action {
 
   run(){
     this.game.changeScene(this.scene_id);
+    this.game.player.location = this.player_pos;
   }
 }
 
@@ -398,10 +399,19 @@ class Action_menu extends Action {
     this.prompt = [];
     this.choices = [];
     this.variable = null;
+    this.useValue = false;
   }
 
   run(args){
-    this.game.displayMenu(this.choices,this.prompt,this.variable);
+    var processedChoices = [];
+    var procssedPrompt = [];
+    for (var line of this.choices){
+      processedChoices.push(this.replaceVariables(line));
+    }
+    for (var l of this.prompt){
+      procssedPrompt.push(this.replaceVariables(l));
+    }
+    this.game.displayMenu(processedChoices,procssedPrompt,this.variable,this.useValue);
   }
 
   load(data){
@@ -409,6 +419,7 @@ class Action_menu extends Action {
     this.choices = data['choices'];
     this.prompt = data['prompt'];
     this.variable = data['variable'];
+    this.useValue = data['useValue'];
   }
 
   save(){
@@ -416,6 +427,7 @@ class Action_menu extends Action {
     data['choices'] = this.choices;
     data['prompt'] = this.prompt;
     data['variable'] = this.variable;
+    data['useValue'] = this.useValue;
     return data;
   }
 
@@ -456,6 +468,17 @@ class Action_menu extends Action {
 
     editView.append(inputLabel1,promptInputField,document.createElement('br'));
 
+    var useValueCheckbox = createElementWithAttributes('input',{'type':'checkbox'});
+    useValueCheckbox.checked = this.useValue;
+    useValueCheckbox.addEventListener("change", (event)=>{
+      me.useValue = event.target.checked;
+    })
+
+    var inputLabel3 = document.createElement("label");
+    inputLabel3.innerHTML = "use value instead of index to set variable"
+
+    editView.append(useValueCheckbox,inputLabel3,document.createElement('br'));
+
     var inputLabel2 = document.createElement("label");
     inputLabel2.innerHTML = "Menu choices: ";
 
@@ -487,7 +510,11 @@ class Action_message extends Action {
   }
 
   run(args){
-    this.game.displayMessage(this.text_lines);
+    var processedLines = [];
+    for (var line of this.text_lines){
+      processedLines.push(this.replaceVariables(line));
+    }
+    this.game.displayMessage(processedLines);
   }
 
   load(data){
@@ -625,7 +652,7 @@ class Action_else extends Action {
   }
 
   updateDisplay(nodeSpan){
-    nodeSpan.innerHTML = '<b>else</b>';
+    nodeSpan.innerHTML = '<b>Else</b>';
   }
 }
 
@@ -749,5 +776,112 @@ class Action_loop extends Action_if_eval {
       this.game.runStackInsert([nextLoop]);//add self until condition not met
       this.game.runStackInsert(this.actions);
     }
+  }
+}
+
+class Action_switch extends Action {
+
+  constructor(data){
+    super(data);
+
+    this.name = "Action_switch";
+    this.description = "Switch/Case - add case actions as children with conditions. The other children of the switch action are the default actions if no case condition is met."
+    this.actions = [];
+
+    this.variable = null;
+  }
+
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = '<b>Switch</b> ($' + this.variable + ')';
+  }
+
+  run(){
+  }
+
+  load(data){
+    super.load(data);
+    this.variable = data['variable'];
+  }
+
+  save(){
+    var data = super.save();
+    data['variable'] = this.variable;
+    return data;
+  }
+
+  run(){
+    console.log(this.game.variables);
+    var variableValue = this.game.variables[this.variable];
+    console.log(variableValue);
+    var runActions = this.actions; //by default run the switch's actions
+    for(const a of this.actions){
+      if (a.name == 'Action_case'){
+        var aValue = eval(a.value);
+        console.log(aValue);
+        if (variableValue == aValue){
+          runActions = a.actions;
+        }
+      }
+    }
+    this.game.runStackInsert(runActions);
+  }
+
+    edit(node) {
+    super.edit(node);
+    var me = this;
+    var editView = document.getElementById("editview");
+
+    var inputLabel = document.createElement('label');
+    inputLabel.innerHTML = "Variable name: ";
+    var variableInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    variableInputField.value = this.variable;
+    variableInputField.addEventListener("change", (event)=> {
+      me.variable = event.target.value;
+      me.updateNodes();
+    });
+    editView.append(inputLabel,variableInputField);
+  }
+}
+
+class Action_case extends Action {
+
+  constructor(data){
+    super(data);
+
+    this.name = "Action_case";
+    this.description = "Case for Switch. Does nothing unless it is the child of a Switch action.";
+    this.actions = [];
+    this.value = null;
+  }
+
+  updateDisplay(nodeSpan){
+    nodeSpan.innerHTML = '<b>Case</b>: ' + this.value;
+  }
+
+  load(data){
+    super.load(data);
+    this.value = data['value'];
+  }
+
+  save(){
+    var data = super.save();
+    data['value'] = this.value;
+    return data;
+  }
+
+  edit(node) {
+    super.edit(node);
+    var me = this;
+    var editView = document.getElementById("editview");
+
+    var inputLabel = document.createElement('label');
+    inputLabel.innerHTML = "Varlue: ";
+    var valueInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    valueInputField.value = this.value;
+    valueInputField.addEventListener("change", (event)=> {
+      me.value = event.target.value;
+      me.updateNodes();
+    });
+    editView.append(inputLabel,valueInputField);
   }
 }

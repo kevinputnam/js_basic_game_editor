@@ -1,4 +1,4 @@
-var game_files = ["game_data_0.json","game_data_1.json"];
+var game_files = ["game_data_1.json"];
 var game = null;
 var saveLink = null;
 

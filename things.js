@@ -6,9 +6,11 @@ class Thing extends GameContainer {
   constructor(data) {
     super(data);
 
-    this.id = Thing.next_id;
-    Thing.next_id += 1;
-    this.type = "Thing";
+    if(data['type'] != 'Player'){
+      this.id = Thing.next_id;
+      Thing.next_id += 1;
+      this.type = "Thing";
+    }
 
     this.hidden = false;
     this.trigger = false;
@@ -109,7 +111,24 @@ class Thing extends GameContainer {
       me.game.updatePlayView();
     })
 
-    editView.append(inputLabel2,xInputField,yInputField,document.createElement('br'),spriteThumbnail,document.createElement('br'));
+    editView.append(inputLabel2,xInputField,yInputField,document.createElement('br'));
+
+    var inputLabel3 = document.createElement("label")
+    inputLabel3.innerHTML = "Dimensions [x,y]: ";
+
+    var xDimInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':'1000'});
+    xDimInputField.value = this.dimensions[0];
+    xDimInputField.addEventListener("change", (event)=> {
+      me.dimensions[0] = event.target.value;
+    })
+
+    var yDimInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':'1000'});
+    yDimInputField.value = this.dimensions[1];
+    yDimInputField.addEventListener("change", (event)=> {
+      me.dimensions[1] = event.target.value;
+    })
+
+    editView.append(inputLabel3,xDimInputField,yDimInputField,document.createElement('br'),spriteThumbnail,document.createElement('br'));
 
     if (!node.classList.contains('game'))
     {
