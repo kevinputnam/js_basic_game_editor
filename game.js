@@ -15,6 +15,7 @@ class Game extends GameContainer {
     this.screenDimensions = [360,240];
     this.canvas = null;
     this.playContext = null;
+    this.ctxScaling = 2;
     this.currentScene = null;
     this.messageBoxDimensions = [200,100];
     this.textFontSize = 10;
@@ -32,6 +33,7 @@ class Game extends GameContainer {
     this.controlKeys = ["ArrowDown","ArrowUp","ArrowLeft","ArrowRight","a","s"];
     this.buttonEventHandler = "default";
     this.player = null;
+    this.collisionListener = null;
   }
 
   handleEvent(event){
@@ -209,7 +211,7 @@ class Game extends GameContainer {
         newLoc[1] = 0;
       }
 
-      //process collisions
+      //process thing interactions
       const p_loc = newLoc;
       const p_dim = this.player.dimensions;
       var player_rect = [p_loc[0],p_loc[1],p_loc[0]+p_dim[0],p_loc[1]+p_dim[1]];
@@ -223,6 +225,18 @@ class Game extends GameContainer {
           newLoc[0] = this.player.location[0];
           newLoc[1] = this.player.location[1];
           this.things[thing_id].run();
+        }
+      }
+      const collDim = this.currentScene.collisionDimensions;
+      for(const [x_str,y_list] of Object.entries(this.currentScene.collisions)){
+        var x_coord = parseInt(x_str)*collDim;
+        for(var y of y_list){
+          var y_coord = y*collDim;
+          var coll_rect = [x_coord,y_coord,x_coord+collDim,y_coord+collDim];
+          if (collision(player_rect,coll_rect)){
+            newLoc[0] = this.player.location[0];
+            newLoc[1] = this.player.location[1];
+          }
         }
       }
       this.player.location[0] = newLoc[0];
@@ -242,7 +256,7 @@ class Game extends GameContainer {
     this.canvas.setAttribute('height','480');
     playView.append(this.canvas);
     this.playContext = this.canvas.getContext("2d");
-    this.playContext.scale(2,2);
+    this.playContext.scale(this.ctxScaling,this.ctxScaling);
     this.playContext.imageSmoothingEnabled = false;
     this.playContext.font = this.textFont;
   }
@@ -264,6 +278,51 @@ class Game extends GameContainer {
       this.drawMenu();
     }else{
       this.playContext.clearRect(0,0,this.screenDimensions[0],this.screenDimensions[1]);
+    }
+  }
+
+  editCollisions(){
+    var me = this;
+    if (this.currentScene){
+      if(this.currentScene.backgroundImage){
+        if(this.playContext){
+          this.collisionListener = this.canvas.addEventListener(
+            "click",
+            function (event) {
+              var collisions = me.currentScene.collisions;
+              var collisionLocScale = me.ctxScaling * me.currentScene.collisionDimensions;
+              var collClickX = Math.floor(event.layerX/collisionLocScale);
+              var collClickY = Math.floor(event.layerY/collisionLocScale);
+              console.log("click location: [" + collClickX + "," + collClickY + "]");
+              if(!Object.keys(collisions).includes(collClickX.toString())){
+                collisions[collClickX] = [collClickY];
+              }else if (!collisions[collClickX].includes(collClickY)){
+                collisions[collClickX].push(collClickY);
+              }else{
+                console.log("remove Y!");
+                collisions[collClickX].splice(collisions[collClickX].indexOf(collClickY),1);
+              }
+              console.log(collisions);
+              me.drawCollisions();
+            },
+            false,
+          );
+          this.drawCollisions();
+        }
+      }
+    }
+  }
+
+  drawCollisions(){
+    this.updatePlayView();
+    this.playContext.fillStyle='red';
+    const collDim = this.currentScene.collisionDimensions;
+    for(const [x_str,y_list] of Object.entries(this.currentScene.collisions)){
+      var x_coord = parseInt(x_str)*collDim;
+      for(var y of y_list){
+        var y_coord = y*collDim;
+        this.playContext.fillRect(x_coord, y_coord, collDim, collDim);
+      }
     }
   }
 

@@ -14,7 +14,8 @@ class Scene extends GameContainer {
     this.draw_player = false;
     this.map_size = [];
     this.grid_size = null;
-    this.collisions = [];
+    this.collisions = {};
+    this.collisionDimensions = 8;
   }
 
   run(){
@@ -93,6 +94,7 @@ class Scene extends GameContainer {
       me.backgroundImage.setAttribute('src',event.target.value);
     })
 
+    this.game.editCollisions();
 
     editView.append(inputLabel,imageFileInputField,document.createElement('br'),backgroundThumbnail,document.createElement('br'));
     editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
