@@ -1,6 +1,7 @@
 var game_files = ["game_data_1.json"];
 var game = null;
 var saveLink = null;
+var game_data = null;
 
 var savebtn = document.getElementById('savebutton');
 var loadbtn = document.getElementById('loadbutton');
@@ -55,6 +56,7 @@ function save_game(){
 
 function run_game(){
   if(game){
+    game_data = game.save();
     args = {};
     args['disable_editing'] = disable_editing;
     args['enable_editing'] = enable_editing;
@@ -82,6 +84,9 @@ function enable_editing(){
   savebtn.disabled = false;
   newbtn.disabled = false;
   runbtn.disabled = false;
+  var gameJSON = JSON.stringify(game_data,null,'  ');
+  reset();
+  load_game(gameJSON);
 }
 
 function reset(){
@@ -95,7 +100,8 @@ function reset(){
   Thing.next_id = 0;
   Scene.next_id = 0;
 
-  game = null;
   editView.replaceChildren();
   gameView.replaceChildren();
+
+  game = null;
 }

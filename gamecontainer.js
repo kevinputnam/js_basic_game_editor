@@ -95,7 +95,9 @@ class GameContainer extends BuildingBlock{
   save(data){
     var data = {'name':this.name};
     data['description'] = this.description;
-    data['things'] = this.things;
+    if(Array.isArray(this.things)){
+      data['things'] = this.things.concat();
+    }
     var actions = null;
     if (this.actions){
       actions = [];
