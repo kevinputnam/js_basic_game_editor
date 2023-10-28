@@ -72,6 +72,13 @@
             0,
             0
           ]
+        },
+        {
+          "name": "Action_message",
+          "actions": null,
+          "text_lines": [
+            "You pick up the key card."
+          ]
         }
       ],
       "id": 1,
