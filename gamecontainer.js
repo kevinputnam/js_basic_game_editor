@@ -202,6 +202,7 @@ class GameContainer extends BuildingBlock{
         "click",
         function () {
           me.addThing(me.addThingSelector.value);
+          me.game.updatePlayView();
         },
         false,
       );
