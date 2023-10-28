@@ -187,7 +187,7 @@ class Thing extends GameContainer {
     if(this.parent){
       this.parent.things.splice(this.parent.things.indexOf(this.id),1);
     }
-    this.parent = null;
+    this.parent = this.game;
     var editView = document.getElementById('editview');
     editView.replaceChildren();
     this.game.updatePlayView();

@@ -77,8 +77,11 @@ class GameContainer extends BuildingBlock{
   load(data){
     this.name = data['name'];
     this.description = data['description'];
-    this.things = data['things'];
-
+    if (Array.isArray(this.things)){
+      for (const thing_id of data['things']){
+        this.things.push(parseInt(thing_id));
+      }
+    }
     if (this.actions){
       for (const action of data['actions']){
         var new_action = eval("new " + action['name'] + "({'parent':this,'game':this.game})");
@@ -109,8 +112,8 @@ class GameContainer extends BuildingBlock{
 
   buildThingSelector(thingDict){
     var thingSelector = document.createElement('select');
-    for (const [t_id,t] of Object.entries(thingDict)){
-      if (t_id != this.id && t.parent == null){
+    for (var [t_id,t] of Object.entries(thingDict)){
+      if (t.parent.type == "Game"){
         var opt = new Option;
         opt.value = t_id;
         opt.innerHTML = t.name + '['+t.id+']';
@@ -131,7 +134,7 @@ class GameContainer extends BuildingBlock{
   }
 
   addThing(thing_id){
-    this.things.push(thing_id);
+    this.things.push(parseInt(thing_id));
     this.game.things[thing_id].parent = this;
     for (const node of this.nodes){
       var thingNodes = this.getChildContainer(node,'things');
