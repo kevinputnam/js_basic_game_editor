@@ -6,18 +6,54 @@
       "name": "Rock",
       "description": "A big old rock.",
       "things": [],
-      "actions": [],
+      "actions": [
+        {
+          "name": "Action_has_thing",
+          "actions": null,
+          "variable": "has_keycard",
+          "possessor_id": -1,
+          "thing_id": "1"
+        },
+        {
+          "name": "Action_if_eval",
+          "actions": [
+            {
+              "name": "Action_message",
+              "actions": null,
+              "text_lines": [
+                "Welcome to my secret world!"
+              ]
+            },
+            {
+              "name": "Action_else",
+              "actions": [
+                {
+                  "name": "Action_message",
+                  "actions": null,
+                  "text_lines": [
+                    "Come back when you have a",
+                    "key card or something."
+                  ]
+                }
+              ]
+            }
+          ],
+          "val1": "`$has_keycard`",
+          "val2": "true",
+          "operator": "=="
+        }
+      ],
       "id": 0,
       "hidden": false,
       "trigger": false,
       "triggered": false,
       "location": [
-        "92",
-        "130"
+        92,
+        130
       ],
       "dimensions": [
-        "16",
-        "16"
+        16,
+        16
       ],
       "spritePath": "/assets/sprites/rock.png"
     },
@@ -25,18 +61,26 @@
       "name": "Key Card",
       "description": "Maybe try to open a door with it?",
       "things": [],
-      "actions": [],
+      "actions": [
+        {
+          "name": "Action_put_thing",
+          "actions": null,
+          "thing_id": "1",
+          "target_type": "player",
+          "target_id": 0
+        }
+      ],
       "id": 1,
       "hidden": false,
       "trigger": false,
       "triggered": false,
       "location": [
-        "30",
-        "200"
+        30,
+        200
       ],
       "dimensions": [
-        "16",
-        "16"
+        16,
+        16
       ],
       "spritePath": "assets/sprites/access_card.png"
     },
@@ -54,8 +98,8 @@
         46
       ],
       "dimensions": [
-        "16",
-        "16"
+        16,
+        16
       ],
       "spritePath": "assets/sprites/dog.png"
     }
@@ -93,12 +137,12 @@
     "trigger": false,
     "triggered": false,
     "location": [
-      0,
-      0
+      74,
+      126
     ],
     "dimensions": [
-      "16",
-      "16"
+      16,
+      16
     ],
     "spritePath": "assets/sprites/jamie.png"
   },
@@ -272,8 +316,8 @@
           "actions": null,
           "scene_id": "3",
           "player_pos": [
-            "30",
-            "30"
+            74,
+            126
           ]
         }
       ],
@@ -288,8 +332,8 @@
       "description": "The first game screen",
       "things": [
         0,
-        1,
-        2
+        2,
+        "1"
       ],
       "actions": [
         {
@@ -371,7 +415,7 @@
                   "actions": null,
                   "thing_id": 0,
                   "location": [
-                    "92",
+                    "200",
                     "130"
                   ]
                 }

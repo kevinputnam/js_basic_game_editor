@@ -19,3 +19,11 @@ function toggleHighlight(nodeSpan){
   nodeSpan.classList.add('select-highlight');
 }
 
+function collision(rect1,rect2){
+  var dx = Math.min(rect1[2], rect2[2]) - Math.max(rect1[0], rect2[0]);
+  var dy = Math.min(rect1[3], rect2[3]) - Math.max(rect1[1], rect2[1]);
+  if (dx > 0 && dy > 0){
+    return true;
+  }
+  return false;
+}

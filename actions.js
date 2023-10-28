@@ -1,7 +1,7 @@
 
 
 //register actions here, for add method.
-const action_types = ['Action_else','Action_loop','Action_if_eval','Action_menu','Action_message','Action_start_timer','Action_set_var','Action_change_scene','Action_move_thing','Action_switch','Action_case'];
+const action_types = ['Action_else','Action_loop','Action_if_eval','Action_menu','Action_message','Action_start_timer','Action_set_var','Action_change_scene','Action_move_thing','Action_switch','Action_case','Action_has_thing','Action_put_thing'];
 
 
 //prototype for all actions
@@ -305,7 +305,8 @@ class Action_move_thing extends Action {
   }
 
   run(){
-    this.game.things[this.thing_id].location = this.location;
+    this.game.things[this.thing_id].location[0] = parseInt(this.location[0]);
+    this.game.things[this.thing_id].location[1] = parseInt(this.location[1]);
   }
 }
 
@@ -384,7 +385,8 @@ class Action_change_scene extends Action {
 
   run(){
     this.game.changeScene(this.scene_id);
-    this.game.player.location = this.player_pos;
+    this.game.player.location[0] = this.player_pos[0];
+    this.game.player.location[1] = this.player_pos[1];
   }
 }
 
@@ -883,5 +885,315 @@ class Action_case extends Action {
       me.updateNodes();
     });
     editView.append(inputLabel,valueInputField);
+  }
+}
+
+class Action_has_thing extends Action {
+
+  constructor(data){
+    super(data);
+
+    this.name = 'Action_has_thing';
+    this.description = "Sets variable to true or false based on whether the chosen thing (or player) has another thing in its inventory";
+
+    this.variable = null;
+    this.possessor_id = -1; //-1 is reserved for the player.
+    this.thing_id = 0;
+  }
+
+  updateDisplay(nodeSpan){
+    var possessor_name = ''
+    if (this.possessor_id == -1){
+      possessor_name = this.game.player.name;
+    }else{
+      possessor_name = this.game.things[this.possessor_id];
+    }
+    nodeSpan.innerHTML = "$" + this.variable + "= <b>does</b> " + possessor_name + " <b>have</b> " + this.game.things[this.thing_id].name + "?";
+  }
+
+  load(data){
+    super.load(data);
+    this.variable = data['variable'];
+    this.possessor_id = data['possessor_id'];
+    this.thing_id = data['thing_id'];
+  }
+
+  save(){
+    var data = super.save();
+    data['variable'] = this.variable;
+    data['possessor_id'] = this.possessor_id;
+    data['thing_id'] = this.thing_id;
+    return data;
+  }
+
+  run(){
+    var returnValue = false;
+    var possessor = null;
+    if(this.possessor_id == -1){
+      possessor = this.game.player;
+    }else{
+      possessor = this.game.things[this.possessor_id];
+    }
+    if(possessor.things.includes(parseInt(this.thing_id))){
+      returnValue = true;
+    }
+    this.game.variables[this.variable] = returnValue;
+  }
+
+  edit(node){
+    super.edit(node);
+    var me = this;
+    var editView = document.getElementById('editview');
+
+    var inputLabel = document.createElement('label');
+    inputLabel.innerHTML = "Variable: ";
+    var variableInputField = createElementWithAttributes('input',{'type':'text','maxlength':'25','size':'17'});
+    variableInputField.value = this.variable;
+    variableInputField.addEventListener("change", (event)=> {
+      me.variable = event.target.value;
+      me.updateNodes();
+    });
+    editView.append(inputLabel,variableInputField,document.createElement('br'));
+
+    var inputLabel2 = document.createElement("label")
+    inputLabel2.innerHTML = "Possessor: ";
+
+    var thingSelector = document.createElement('select');
+    var p = new Option;
+    p.value = -1;
+    p.innerHTML = this.game.player.name + "[player]";
+    if(this.possessor_id == -1){
+       p.setAttribute('selected','true');
+    }
+    thingSelector.appendChild(p);
+    for (const [thing_id,thing] of Object.entries(this.game.things)){
+      var s = new Option;
+      s.value = thing_id;
+      s.innerHTML = thing.name + "[" + thing_id + "]";
+      if(this.possessor_id == thing_id){
+        s.setAttribute('selected','true');
+      }
+      thingSelector.appendChild(s);
+    }
+    thingSelector.addEventListener("change", (event)=> {
+      me.possessor_id = event.target.value;
+      me.updateNodes();
+    });
+    editView.append(inputLabel2,thingSelector,document.createElement('br'));
+
+    var inputLabel3 = document.createElement("label")
+    inputLabel3.innerHTML = "Thing: ";
+
+    var thingSelector2 = document.createElement('select');
+    for (const [thing_id,thing] of Object.entries(this.game.things)){
+      var s = new Option;
+      s.value = thing_id;
+      s.innerHTML = thing.name + "[" + thing_id + "]";
+      if(this.thing_id == thing_id){
+        s.setAttribute('selected','true');
+      }
+      thingSelector2.appendChild(s);
+    }
+    thingSelector2.addEventListener("change", (event)=> {
+      me.thing_id = event.target.value;
+      me.updateNodes();
+    });
+    editView.append(inputLabel3,thingSelector2,document.createElement('br'));
+  }
+}
+
+class Action_put_thing extends Action {
+
+  constructor(data){
+    super(data);
+
+    this.name = 'Action_put_thing';
+    this.description = "Adds the thing to the designated target. It will remove it from it's current parent as well. Selecting 'none' will remove it from wherever it is. It will still be available to add later.";
+
+    this.thing_id = 0;
+    this.target_type = 'none';
+    this.target_id = 0;
+  }
+
+  updateDisplay(nodeSpan){
+    var target = null;
+    var target_name = 'none';
+    if (this.target_type == 'scene'){
+      target = this.game.scenes[this.target_id];
+      target_name = target.name + "[" + this.target_id + "]";
+    }else if(this.target_type == 'thing'){
+      target = this.game.things[this.target_id];
+      target_name = target.name + "[" + this.target_id + "]";
+    }else if(this.target_type == 'player'){
+      target = this.game.player;
+      target_name = target.name + "[player]";
+    }
+
+    nodeSpan.innerHTML = "<b>Add</b> " + this.game.things[this.thing_id].name + " <b>to</b> " + target_name;
+  }
+
+  load(data){
+    super.load(data);
+    this.thing_id = data['thing_id'];
+    this.target_type = data['target_type'];
+    this.target_id = data['target_id'];
+  }
+
+  save(){
+    var data = super.save();
+    data['thing_id'] = this.thing_id;
+    data['target_type'] = this.target_type;
+    data['target_id'] = this.target_id;
+    return data;
+  }
+
+  run(args){
+    var thing = this.game.things[this.thing_id];
+    console.log(thing.name);
+    var target = null;
+    thing.remove();
+    if (this.target_type == 'scene'){
+      target = this.game.scenes[this.target_id];
+    }else if (this.target_type == 'thing'){
+      target = this.game.things[this.target_id];
+    }else if (this.target_type == 'player'){
+      target = this.game.player;
+    }else{
+      return;
+    }
+    target.addThing(thing.id);
+  }
+
+  edit(node){
+    super.edit(node);
+    var me = this;
+    var editView = document.getElementById('editview');
+
+    var inputLabel = document.createElement("label")
+    inputLabel.innerHTML = "Add thing: ";
+
+    var thingSelector = document.createElement('select');
+    for (const [thing_id,thing] of Object.entries(this.game.things)){
+      var s = new Option;
+      s.value = thing_id;
+      s.innerHTML = thing.name + "[" + thing_id + "]";
+      if(this.thing_id == thing_id){
+        s.setAttribute('selected','true');
+      }
+      thingSelector.appendChild(s);
+    }
+    thingSelector.addEventListener("change", (event)=> {
+      me.thing_id = event.target.value;
+      me.updateNodes();
+    })
+
+    var targetLabel = document.createElement('label');
+    targetLabel.innerHTML = 'to target: <br>'
+
+    editView.append(inputLabel,thingSelector,document.createElement('br'),targetLabel);
+
+    this.sceneDiv = createElementWithAttributes('div',{'class':'hidden'});
+
+    var inputLabel2 = document.createElement("label")
+    inputLabel2.innerHTML = "Scene: ";
+
+    var sceneSelector2 = document.createElement('select');
+    for (const [scene_id,scene] of Object.entries(this.game.scenes)){
+      var s = new Option;
+      s.value = scene_id;
+      s.innerHTML = scene.name + "[" + scene_id + "]";
+      if(this.target_id == scene_id){
+        s.setAttribute('selected','true');
+      }
+      sceneSelector2.appendChild(s);
+    }
+    sceneSelector2.addEventListener("change", (event)=> {
+      me.target_id = event.target.value;
+      me.updateNodes();
+    })
+
+    this.sceneDiv.append(inputLabel2,sceneSelector2);
+
+    this.thingDiv = createElementWithAttributes('div',{'class':'hidden'});
+
+    var inputLabel3 = document.createElement("label")
+    inputLabel3.innerHTML = "Thing: ";
+
+    var thingSelector2 = document.createElement('select');
+    for (const [thing_id,thing] of Object.entries(this.game.things)){
+      var s = new Option;
+      s.value = thing_id;
+      s.innerHTML = thing.name + "[" + thing_id + "]";
+      if(this.target_id == thing_id){
+        s.setAttribute('selected','true');
+      }
+      thingSelector2.appendChild(s);
+    }
+    thingSelector2.addEventListener("change", (event)=> {
+      me.target_id = event.target.value;
+      me.updateNodes();
+    })
+
+    this.thingDiv.append(inputLabel3,thingSelector2);
+
+    var radio1 = createElementWithAttributes('input',{'type':'radio','name':'target_type'});
+    radio1.addEventListener("change", (event)=> {
+      if (event.target.checked){
+        me.target_type = 'scene';
+        me.sceneDiv.setAttribute('class','');
+        me.thingDiv.setAttribute('class','hidden');
+        me.updateNodes();
+      }
+    })
+    var radioLabel = document.createElement('label');
+    radioLabel.innerHTML = 'Scene | ';
+
+    var radio2 = createElementWithAttributes('input',{'type':'radio','name':'target_type'});
+    radio2.addEventListener("change", (event)=> {
+      if (event.target.checked){
+        me.target_type = 'thing';
+        me.sceneDiv.setAttribute('class','hidden');
+        me.thingDiv.setAttribute('class','');
+        me.updateNodes();
+      }
+    })
+    var radioLabel2 = document.createElement('label');
+    radioLabel2.innerHTML = 'Thing | ';
+
+    var radio3 = createElementWithAttributes('input',{'type':'radio','name':'target_type'});
+    radio3.addEventListener("change", (event)=> {
+      if (event.target.checked){
+        me.target_type = 'player';
+        me.sceneDiv.setAttribute('class','hidden');
+        me.thingDiv.setAttribute('class','hidden');
+        me.updateNodes();
+      }
+    })
+    var radioLabel3 = document.createElement('label');
+    radioLabel3.innerHTML = 'Player | ';
+
+    var radio4 = createElementWithAttributes('input',{'type':'radio','name':'target_type'});
+    radio4.addEventListener("change", (event)=> {
+      if (event.target.checked){
+        me.target_type = 'none';
+        me.sceneDiv.setAttribute('class','hidden');
+        me.thingDiv.setAttribute('class','hidden');
+        me.updateNodes();
+      }
+    })
+    var radioLabel4 = document.createElement('label');
+    radioLabel4.innerHTML = 'None';
+
+    if(this.target_type == 'scene'){
+      radio1.checked = true;
+    }else if (this.target_type == 'thing'){
+      radio2.checked = true;
+    }else if (this.target_type == 'player'){
+      radio3.checked = true;
+    }else if (this.target_type == 'none'){
+      radio4.checked = true;
+    }
+
+    editView.append(radio1,radioLabel,radio2,radioLabel2,radio3,radioLabel3,radio4,radioLabel4,document.createElement('br'),this.sceneDiv,this.thingDiv);
   }
 }

@@ -38,6 +38,21 @@ class Thing extends GameContainer {
     //TODO add sprite handling this.sprite = ?
     this.location = data['location'];
     this.dimensions = data['dimensions'];
+
+    var newcoords = []
+    for(var item of this.location){
+      item = parseInt(item);
+      newcoords.push(item);
+    }
+    this.location = newcoords;
+
+    newcoords = [];
+    for(var item of this.dimensions){
+      item = parseInt(item);
+      newcoords.push(item);
+    }
+    this.dimensions = newcoords;
+
     this.spritePath = data['spritePath'];
     if(this.spritePath){
       this.spriteImage = document.createElement('img');
@@ -68,6 +83,10 @@ class Thing extends GameContainer {
       }
     }
     return null;
+  }
+
+  run(){
+    this.game.runStackInsert(this.actions);
   }
 
   edit(node){

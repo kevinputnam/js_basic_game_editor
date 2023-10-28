@@ -58,20 +58,16 @@ class Game extends GameContainer {
   defaulButtonHandler(key){
     switch (key) {
       case "ArrowDown":
-        console.log('go down.' + this.player.location);
-        this.player.location[1] = parseInt(this.player.location[1]) + 2;
+        this.movePlayer([0,2]);
         break;
       case "ArrowUp":
-        console.log('go up.' + this.player.location);
-        this.player.location[1] = parseInt(this.player.location[1]) - 2;
+        this.movePlayer([0,-2]);
         break;
       case "ArrowLeft":
-        console.log('go left.' + this.player.location);
-        this.player.location[0] = parseInt(this.player.location[0]) - 2;
+        this.movePlayer([-2,0]);
         break;
       case "ArrowRight":
-        this.player.location[0] = parseInt(this.player.location[0]) + 2;
-        console.log('go right.' + this.player.location);
+        this.movePlayer([2,0]);
         break;
       case "a":
         console.log('select');
@@ -188,11 +184,30 @@ class Game extends GameContainer {
     this.runStack.unshift(...actionsCopy);
   }
 
-
   changeScene(scene_id){
     this.runStackClear();
     this.currentScene = this.scenes[scene_id];
     this.currentScene.run();
+  }
+
+  movePlayer(coords){
+    if (this.currentScene.draw_player){
+      this.player.location[0] = parseInt(this.player.location[0]) + coords[0];
+      this.player.location[1] = parseInt(this.player.location[1]) + coords[1];
+
+      const p_loc = this.player.location;
+      const p_dim = this.player.dimensions;
+      var player_rect = [p_loc[0],p_loc[1],p_loc[0]+p_dim[0],p_loc[1]+p_dim[1]];
+
+      for(const thing_id of this.currentScene.things){
+        const t_loc = this.game.things[thing_id].location;
+        const t_dim = this.game.things[thing_id].dimensions;
+        var thing_rect = [t_loc[0],t_loc[1],t_loc[0]+t_dim[0],t_loc[1]+t_dim[1]];
+        if (collision(player_rect,thing_rect)){
+          this.things[thing_id].run();
+        }
+      }
+    }
   }
 
   createPlayContext(){
