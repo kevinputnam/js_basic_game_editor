@@ -67,7 +67,11 @@
           "actions": null,
           "thing_id": "1",
           "target_type": "player",
-          "target_id": 0
+          "target_id": 0,
+          "location": [
+            0,
+            0
+          ]
         }
       ],
       "id": 1,
@@ -88,7 +92,15 @@
       "name": "Dog",
       "description": "Boy, is that dog cute!",
       "things": [],
-      "actions": [],
+      "actions": [
+        {
+          "name": "Action_message",
+          "actions": null,
+          "text_lines": [
+            "Woof!"
+          ]
+        }
+      ],
       "id": 2,
       "hidden": false,
       "trigger": false,
@@ -137,8 +149,8 @@
     "trigger": false,
     "triggered": false,
     "location": [
-      74,
-      126
+      58,
+      134
     ],
     "dimensions": [
       16,
@@ -205,12 +217,6 @@
       "things": [],
       "actions": [
         {
-          "name": "Action_start_timer",
-          "actions": null,
-          "milliseconds": 0,
-          "variable": "default_timer"
-        },
-        {
           "name": "Action_menu",
           "actions": null,
           "choices": [
@@ -225,6 +231,12 @@
           ],
           "variable": "banana",
           "useValue": true
+        },
+        {
+          "name": "Action_start_timer",
+          "actions": null,
+          "milliseconds": 0,
+          "variable": "default_timer"
         },
         {
           "name": "Action_change_scene",
@@ -247,12 +259,6 @@
       "description": "Pirate's Bane",
       "things": [],
       "actions": [
-        {
-          "name": "Action_start_timer",
-          "actions": null,
-          "milliseconds": 0,
-          "variable": "default_timer"
-        },
         {
           "name": "Action_switch",
           "actions": [
@@ -312,6 +318,12 @@
           "variable": "banana"
         },
         {
+          "name": "Action_start_timer",
+          "actions": null,
+          "milliseconds": 0,
+          "variable": "default_timer"
+        },
+        {
           "name": "Action_change_scene",
           "actions": null,
           "scene_id": "3",
@@ -333,7 +345,7 @@
       "things": [
         0,
         2,
-        "1"
+        1
       ],
       "actions": [
         {

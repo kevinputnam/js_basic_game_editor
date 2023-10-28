@@ -1008,19 +1008,22 @@ class Action_put_thing extends Action {
     super(data);
 
     this.name = 'Action_put_thing';
-    this.description = "Adds the thing to the designated target. It will remove it from it's current parent as well. Selecting 'none' will remove it from wherever it is. It will still be available to add later.";
+    this.description = "Adds the thing to the designated target. It will remove it from it's current parent as well. Selecting 'none' will remove it from wherever it is. It will still be available to add from the master thing list. If the player is the parent, the scene and location values will be overridden with the current scene and player's location.";
 
     this.thing_id = 0;
     this.target_type = 'none';
     this.target_id = 0;
+    this.location = [0,0];
   }
 
   updateDisplay(nodeSpan){
     var target = null;
     var target_name = 'none';
+    var to_location_text = '';
     if (this.target_type == 'scene'){
       target = this.game.scenes[this.target_id];
       target_name = target.name + "[" + this.target_id + "]";
+      to_location_text = ' <b>to</b> [' + this.location[0] + ',' + this.location[1] + ']';
     }else if(this.target_type == 'thing'){
       target = this.game.things[this.target_id];
       target_name = target.name + "[" + this.target_id + "]";
@@ -1029,7 +1032,7 @@ class Action_put_thing extends Action {
       target_name = target.name + "[player]";
     }
 
-    nodeSpan.innerHTML = "<b>Add</b> " + this.game.things[this.thing_id].name + " <b>to</b> " + target_name;
+    nodeSpan.innerHTML = "<b>Add</b> " + this.game.things[this.thing_id].name + " <b>to</b> " + target_name + to_location_text;
   }
 
   load(data){
@@ -1037,6 +1040,7 @@ class Action_put_thing extends Action {
     this.thing_id = data['thing_id'];
     this.target_type = data['target_type'];
     this.target_id = data['target_id'];
+    this.location = data['location'];
   }
 
   save(){
@@ -1044,16 +1048,24 @@ class Action_put_thing extends Action {
     data['thing_id'] = this.thing_id;
     data['target_type'] = this.target_type;
     data['target_id'] = this.target_id;
+    data['location'] = this.location;
     return data;
   }
 
   run(args){
     var thing = this.game.things[this.thing_id];
-    console.log(thing.name);
     var target = null;
     thing.remove();
     if (this.target_type == 'scene'){
       target = this.game.scenes[this.target_id];
+      if(thing.parent.type == "Player"){
+        target = this.game.currentScene;
+        thing.location[0] = thing.parent.location[0];
+        thing.location[1] = thing.parent.location[1];
+      }else{
+        thing.location[0] = this.location[0];
+        thing.location[1] = this.location[1];
+      }
     }else if (this.target_type == 'thing'){
       target = this.game.things[this.target_id];
     }else if (this.target_type == 'player'){
@@ -1112,7 +1124,24 @@ class Action_put_thing extends Action {
       me.updateNodes();
     })
 
-    this.sceneDiv.append(inputLabel2,sceneSelector2);
+    var sceneLocationLabel = document.createElement('label');
+    sceneLocationLabel.innerHTML = 'Location [x,y]: ';
+
+    var xInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':this.game.screenDimensions[0]});
+    xInputField.value = this.location[0];
+    xInputField.addEventListener("change", (event)=> {
+      me.location[0] = event.target.value;
+      me.updateNodes();
+    });
+
+    var yInputField = createElementWithAttributes('input',{'type':'number','min':'0','max':this.game.screenDimensions[1]});
+    yInputField.value = this.location[1];
+    yInputField.addEventListener("change", (event)=> {
+      me.location[1] = event.target.value;
+      me.updateNodes();
+    });
+
+    this.sceneDiv.append(inputLabel2,sceneSelector2,document.createElement('br'),sceneLocationLabel,xInputField,yInputField);
 
     this.thingDiv = createElementWithAttributes('div',{'class':'hidden'});
 
