@@ -114,10 +114,12 @@ class GameContainer extends BuildingBlock{
     var thingSelector = document.createElement('select');
     for (var [t_id,t] of Object.entries(thingDict)){
       if (t.parent.type == "Game"){
-        var opt = new Option;
-        opt.value = t_id;
-        opt.innerHTML = t.name + '['+t.id+']';
-        thingSelector.appendChild(opt);
+        if (this.type != "Thing" || parseInt(t_id) != parseInt(this.id)){
+          var opt = new Option;
+          opt.value = t_id;
+          opt.innerHTML = t.name + '['+t.id+']';
+          thingSelector.appendChild(opt);
+        }
       }
     }
     return thingSelector;
