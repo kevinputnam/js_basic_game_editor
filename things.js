@@ -187,11 +187,13 @@ class Thing extends GameContainer {
     this.nodes = new_nodes;
     // remove the thing id from its parent's list of things
     if(this.parent){
+      console.log(this.parent);
+      console.log(this.id);
       this.parent.things.splice(this.parent.things.indexOf(this.id),1);
     }
     this.parent = this.game;
-    var editView = document.getElementById('editview');
-    editView.replaceChildren();
+    //var editView = document.getElementById('editview');
+    //editView.replaceChildren();
     this.game.updatePlayView();
   }
 

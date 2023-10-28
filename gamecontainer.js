@@ -80,6 +80,7 @@ class GameContainer extends BuildingBlock{
     if (Array.isArray(this.things)){
       for (const thing_id of data['things']){
         this.things.push(parseInt(thing_id));
+        this.game.things[thing_id].parent=this;
       }
     }
     if (this.actions){
@@ -142,7 +143,7 @@ class GameContainer extends BuildingBlock{
       var thingNodes = this.getChildContainer(node,'things');
       thingNodes.append(this.game.things[thing_id].display());
     }
-    this.edit(this.currentNode);
+    //this.edit(this.currentNode);
   }
 
   newThing(){
