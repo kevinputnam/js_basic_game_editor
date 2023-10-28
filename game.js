@@ -192,10 +192,25 @@ class Game extends GameContainer {
 
   movePlayer(coords){
     if (this.currentScene.draw_player){
-      this.player.location[0] = parseInt(this.player.location[0]) + coords[0];
-      this.player.location[1] = parseInt(this.player.location[1]) + coords[1];
+      var newLoc = [];
+      newLoc[0] = parseInt(this.player.location[0]) + coords[0];
+      newLoc[1] = parseInt(this.player.location[1]) + coords[1];
 
-      const p_loc = this.player.location;
+      //stay within the screen boundaries.
+      if(newLoc[0] + this.player.dimensions[0] > this.screenDimensions[0]){
+        newLoc[0] = this.screenDimensions[0] - this.player.dimensions[0];
+      }else if (this.player.location[0] < 0){
+        newLoc[0] = 0;
+      }
+
+      if(this.player.location[1] + this.player.dimensions[1] > this.screenDimensions[1]){
+        newLoc[1] = this.screenDimensions[1] - this.player.dimensions[1];
+      }else if (this.player.location[1] < 0){
+        newLoc[1] = 0;
+      }
+
+      //process collisions
+      const p_loc = newLoc;
       const p_dim = this.player.dimensions;
       var player_rect = [p_loc[0],p_loc[1],p_loc[0]+p_dim[0],p_loc[1]+p_dim[1]];
 
@@ -204,9 +219,14 @@ class Game extends GameContainer {
         const t_dim = this.game.things[thing_id].dimensions;
         var thing_rect = [t_loc[0],t_loc[1],t_loc[0]+t_dim[0],t_loc[1]+t_dim[1]];
         if (collision(player_rect,thing_rect)){
+          //run the thing and don't overlap it
+          newLoc[0] = this.player.location[0];
+          newLoc[1] = this.player.location[1];
           this.things[thing_id].run();
         }
       }
+      this.player.location[0] = newLoc[0];
+      this.player.location[1] = newLoc[1];
     }
   }
 
