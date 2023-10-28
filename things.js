@@ -149,10 +149,12 @@ class Thing extends GameContainer {
 
     editView.append(inputLabel3,xDimInputField,yDimInputField,document.createElement('br'),spriteThumbnail,document.createElement('br'));
 
-    if (!node.classList.contains('game'))
-    {
-      var editView = document.getElementById('editview');
-      editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
+    if (node){
+      if (!node.classList.contains('game'))
+      {
+        var editView = document.getElementById('editview');
+        editView.append(this.createRemoveButton(),document.createElement('br'),document.createElement('br'));
+      }
     }
   }
 
