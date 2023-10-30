@@ -32,7 +32,7 @@ class Game extends GameContainer {
     this.currentAction = null;
     this.controlKeys = ["ArrowDown","ArrowUp","ArrowLeft","ArrowRight","a","s"];
     this.buttonEventHandler = "default";
-    this.player = null;
+    this.player = new Player({'parent':null,'game':this.game});
     this.collisionListener = null;
   }
 
@@ -263,7 +263,9 @@ class Game extends GameContainer {
 
   updatePlayView(){
     if (this.currentScene){
-      this.playContext.drawImage(this.currentScene.backgroundImage, 0,0);
+      if(this.currentScene.backgroundImage){
+        this.playContext.drawImage(this.currentScene.backgroundImage, 0,0);
+      }
 
       for (const thing_id of this.currentScene.things){
         var thing = game.things[thing_id];

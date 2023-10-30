@@ -10,7 +10,7 @@ class Scene extends GameContainer {
     this.type = "Scene";
 
     this.background = "";
-    this.backgroundImage = null;
+    this.backgroundImage = document.createElement('img');
     this.draw_player = false;
     this.map_size = [];
     this.grid_size = null;
@@ -33,7 +33,6 @@ class Scene extends GameContainer {
     var me = this;
     this.background = data['background'];
     if(this.background){
-      this.backgroundImage = document.createElement('img');
       this.backgroundImage.setAttribute('src',this.background);
       this.backgroundImage.addEventListener("load", (e) => {
         me.game.updatePlayView();
